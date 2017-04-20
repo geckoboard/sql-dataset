@@ -2,19 +2,6 @@ package models
 
 import "fmt"
 
-type Config struct {
-	GeckoboardAPIKey string          `json:"geckoboard_api_key"`
-	DatabaseConfig   *DatabaseConfig `json:"database"`
-	RefreshTimeSec   int32           `json:"refresh_time_sec"`
-}
-
-// DatabaseConfig holds the db type, url
-// and other custom options such as tls config
-type DatabaseConfig struct {
-	Driver Driver
-	URL    string
-}
-
 type Driver string
 
 const (
@@ -23,6 +10,20 @@ const (
 )
 
 var supportedDrivers = []Driver{PostgresDriver, MysqlDriver}
+
+type Config struct {
+	GeckoboardAPIKey string          `json:"geckoboard_api_key"`
+	DatabaseConfig   *DatabaseConfig `json:"database"`
+	RefreshTimeSec   int32           `json:"refresh_time_sec"`
+	Datasets         []Dataset       `json:"datasets"`
+}
+
+// DatabaseConfig holds the db type, url
+// and other custom options such as tls config
+type DatabaseConfig struct {
+	Driver Driver `json:"driver"`
+	URL    string `json:"url"`
+}
 
 func (c Config) Validate() (errors []string) {
 	if c.GeckoboardAPIKey == "" {
@@ -33,6 +34,10 @@ func (c Config) Validate() (errors []string) {
 		errors = append(errors, "Database config is required")
 	} else {
 		errors = append(errors, c.DatabaseConfig.Validate()...)
+	}
+
+	for _, ds := range c.Datasets {
+		errors = append(errors, ds.Validate()...)
 	}
 
 	return errors

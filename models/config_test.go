@@ -63,6 +63,27 @@ func TestValidate(t *testing.T) {
 			},
 			nil,
 		},
+		{
+			Config{
+				GeckoboardAPIKey: "1234-12345",
+				RefreshTimeSec:   120,
+				DatabaseConfig: &DatabaseConfig{
+					Driver: MysqlDriver,
+					URL:    "mysql://localhost/testdb",
+				},
+				Datasets: []Dataset{
+					{
+						Name:       "users.count",
+						UpdateType: "wrong",
+						SQL:        "fake sql",
+						Fields:     []Field{{Name: "count", Type: "number"}},
+					},
+				},
+			},
+			[]string{
+				"Dataset update type must be append or replace",
+			},
+		},
 	}
 
 	for i, tc := range testCases {
