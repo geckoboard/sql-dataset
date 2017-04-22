@@ -1,0 +1,15 @@
+---
+geckoboard_api_key: '1234dsfd21322'
+database_config:
+ driver: postgresql
+ url: "postgres://fake"
+refresh_time_sec: 60
+datasets:
+ - name: active.users.by.org.plan
+   update_type: replace
+   sql: SELECT o.plan_type, count(*) user_count FROM users u, organisation o where o.user_id = u.id AND o.plan_type <> 'trial' order by user_count DESC limit 10
+   fields:
+     - type: 'number'
+       name: "count"
+     - type: 'string'
+       name: "org"

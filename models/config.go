@@ -1,6 +1,12 @@
 package models
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+	"io/ioutil"
+
+	"gopkg.in/yaml.v2"
+)
 
 type Driver string
 
@@ -10,19 +16,38 @@ const (
 )
 
 var supportedDrivers = []Driver{PostgresDriver, MysqlDriver}
+var errParseConfigFile = "Error occurred parsing the config: %s"
 
 type Config struct {
-	GeckoboardAPIKey string          `json:"geckoboard_api_key"`
-	DatabaseConfig   *DatabaseConfig `json:"database"`
-	RefreshTimeSec   int32           `json:"refresh_time_sec"`
-	Datasets         []Dataset       `json:"datasets"`
+	GeckoboardAPIKey string          `yaml:"geckoboard_api_key"`
+	DatabaseConfig   *DatabaseConfig `yaml:"database_config"`
+	RefreshTimeSec   int32           `yaml:"refresh_time_sec"`
+	Datasets         []Dataset       `yaml:"datasets"`
 }
 
 // DatabaseConfig holds the db type, url
 // and other custom options such as tls config
 type DatabaseConfig struct {
-	Driver Driver `json:"driver"`
-	URL    string `json:"url"`
+	Driver Driver `yaml:"driver"`
+	URL    string `yaml:"url"`
+}
+
+func LoadConfig(filepath string) (config *Config, err error) {
+	var b []byte
+
+	if filepath == "" {
+		return nil, errors.New("File path is required to load config")
+	}
+
+	if b, err = ioutil.ReadFile(filepath); err != nil {
+		return nil, err
+	}
+
+	if err = yaml.Unmarshal(b, &config); err != nil {
+		return nil, fmt.Errorf(errParseConfigFile, err)
+	}
+
+	return config, nil
 }
 
 func (c Config) Validate() (errors []string) {

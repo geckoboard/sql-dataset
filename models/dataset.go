@@ -27,10 +27,10 @@ var fieldTypes = []FieldType{
 }
 
 type Dataset struct {
-	Name       string      `json:"name"`
-	UpdateType DatasetType `json:"update_type"`
-	SQL        string      `json:"sql"`
-	Fields     []Field     `json:"fields"`
+	Name       string      `yaml:"name"`
+	UpdateType DatasetType `yaml:"update_type"`
+	SQL        string      `yaml:"sql"`
+	Fields     []Field     `yaml:"fields"`
 }
 
 type Field struct {
