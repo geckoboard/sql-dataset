@@ -33,4 +33,28 @@ func main() {
 
 		os.Exit(1)
 	}
+
+	processAllDatasets(config)
+}
+
+func processAllDatasets(config *models.Config) (hasErrored bool) {
+	for _, ds := range config.Datasets {
+		datasetRecs, err := ds.BuildDataset(config.DatabaseConfig)
+		if err != nil {
+			fmt.Printf("Dataset '%s' errored: %s\n", ds.Name, err)
+			hasErrored = true
+			continue
+		}
+
+		err = PushData(ds, datasetRecs, config.GeckoboardAPIKey)
+		if err != nil {
+			fmt.Printf("Dataset '%s' errored: %s\n", ds.Name, err)
+			hasErrored = true
+			continue
+		}
+
+		fmt.Printf("Dataset '%s' successfully completed\n", ds.Name)
+	}
+
+	return hasErrored
 }
