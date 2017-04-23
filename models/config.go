@@ -8,14 +8,12 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type Driver string
-
 const (
-	PostgresDriver Driver = "postgresql"
-	MysqlDriver    Driver = "mysql"
+	PostgresDriver = "postgres"
+	MysqlDriver    = "mysql"
 )
 
-var supportedDrivers = []Driver{PostgresDriver, MysqlDriver}
+var supportedDrivers = []string{PostgresDriver, MysqlDriver}
 var errParseConfigFile = "Error occurred parsing the config: %s"
 
 type Config struct {
@@ -28,7 +26,7 @@ type Config struct {
 // DatabaseConfig holds the db type, url
 // and other custom options such as tls config
 type DatabaseConfig struct {
-	Driver Driver `yaml:"driver"`
+	Driver string `yaml:"driver"`
 	URL    string `yaml:"url"`
 }
 

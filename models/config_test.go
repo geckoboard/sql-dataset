@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"path/filepath"
 	"reflect"
 	"testing"
@@ -41,7 +40,7 @@ func TestValidate(t *testing.T) {
 				},
 			},
 			[]string{
-				"Unsupported driver 'pear' only [postgresql mysql] are supported",
+				"Unsupported driver 'pear' only [postgres mysql] are supported",
 			},
 		},
 		{
@@ -156,10 +155,6 @@ func TestLoadConfig(t *testing.T) {
 		if tc.err == "" && err != nil {
 			t.Errorf("[%d] Expected no error but got %s", i, err)
 			continue
-		}
-
-		if c != nil {
-			fmt.Println(c.DatabaseConfig)
 		}
 
 		if !reflect.DeepEqual(tc.config, c) {

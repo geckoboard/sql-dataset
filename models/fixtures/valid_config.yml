@@ -1,7 +1,7 @@
 ---
 geckoboard_api_key: '1234dsfd21322'
 database_config:
- driver: postgresql
+ driver: postgres
  url: "postgres://fake"
 refresh_time_sec: 60
 datasets:
