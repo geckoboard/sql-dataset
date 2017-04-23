@@ -40,7 +40,7 @@ func TestValidate(t *testing.T) {
 				},
 			},
 			[]string{
-				"Unsupported driver 'pear' only [postgres mysql] are supported",
+				"Unsupported driver 'pear' only [mysql postgres sqlite3] are supported",
 			},
 		},
 		{

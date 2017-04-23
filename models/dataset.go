@@ -1,6 +1,9 @@
 package models
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 type DatasetType string
 type FieldType string
@@ -34,8 +37,19 @@ type Dataset struct {
 }
 
 type Field struct {
-	Type FieldType `json:"type"`
-	Name string    `json:"name"`
+	Type FieldType `yaml:"type"`
+	// By default the key is the name underscored
+	// if no key value is present
+	Key  string `yaml:"key"`
+	Name string `yaml:"name"`
+}
+
+func (f Field) KeyValue(fieldIdx int) string {
+	if f.Key != "" {
+		return f.Key
+	}
+
+	return strings.ToLower(strings.Replace(f.Name, " ", "_", -1))
 }
 
 func (ds Dataset) Validate() (errors []string) {
