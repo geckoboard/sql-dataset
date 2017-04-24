@@ -44,7 +44,7 @@ func TestEndToEndFlow(t *testing.T) {
 						SQL:  "SELECT app_name, build_cost FROM builds GROUP BY app_name order by app_name",
 						Fields: []models.Field{
 							{Name: "App", Type: models.StringType},
-							{Name: "Build Cost", Type: models.MoneyType},
+							{Name: "Build Cost", Type: models.MoneyType, CurrencyCode: "USD"},
 						},
 					},
 				},
@@ -60,7 +60,7 @@ func TestEndToEndFlow(t *testing.T) {
 				},
 				{
 					Path: "/datasets/app.build.costs",
-					Body: `{"id":"app.build.costs","fields":{"app":{"name":"App","type":"string","currency_code":""},"build_cost":{"name":"Build Cost","type":"money","currency_code":""}},"unique_by":null,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`,
+					Body: `{"id":"app.build.costs","fields":{"app":{"name":"App","type":"string","currency_code":""},"build_cost":{"name":"Build Cost","type":"money","currency_code":"USD"}},"unique_by":null,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`,
 				},
 				{
 					Path: "/datasets/app.build.costs/data",

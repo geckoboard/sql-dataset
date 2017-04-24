@@ -42,6 +42,26 @@ func TestDatasetValidate(t *testing.T) {
 		},
 		{
 			Dataset{
+				Name:       "app.build.cost",
+				UpdateType: Replace,
+				SQL:        "SELECT * FROM some_funky_table;",
+				Fields:     []Field{{Name: "count", Type: MoneyType}},
+			},
+			[]string{
+				"Money type field requires an ISO 4217 currency code",
+			},
+		},
+		{
+			Dataset{
+				Name:       "app.build.cost",
+				UpdateType: Replace,
+				SQL:        "SELECT * FROM some_funky_table;",
+				Fields:     []Field{{Name: "count", Type: MoneyType, CurrencyCode: "USD"}},
+			},
+			nil,
+		},
+		{
+			Dataset{
 				Name:       "users.count",
 				UpdateType: Replace,
 				SQL:        "SELECT * FROM some_funky_table;",

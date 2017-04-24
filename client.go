@@ -42,8 +42,9 @@ func remapFields(ds models.Dataset) (fields gb.Fields) {
 
 	for i, f := range ds.Fields {
 		fields[f.KeyValue(i)] = gb.Field{
-			Name: f.Name,
-			Type: string(f.Type),
+			Name:         f.Name,
+			Type:         string(f.Type),
+			CurrencyCode: f.CurrencyCode,
 		}
 	}
 

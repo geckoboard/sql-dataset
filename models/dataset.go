@@ -37,13 +37,14 @@ type Dataset struct {
 }
 
 type Field struct {
-	Type FieldType `yaml:"type"`
-	// By default the key is the name underscored
-	// if no key value is present
-	Key  string `yaml:"key"`
-	Name string `yaml:"name"`
+	Type         FieldType `yaml:"type"`
+	Key          string    `yaml:"key"`
+	Name         string    `yaml:"name"`
+	CurrencyCode string    `yaml:currency_code`
 }
 
+// KeyValue returns the field key if present
+// otherwise by default returns the field name underscored
 func (f Field) KeyValue(fieldIdx int) string {
 	if f.Key != "" {
 		return f.Key
@@ -92,6 +93,10 @@ func (f Field) Validate() (errors []string) {
 
 	if f.Name == "" {
 		errors = append(errors, "Field name is required")
+	}
+
+	if f.Type == MoneyType && f.CurrencyCode == "" {
+		errors = append(errors, "Money type field requires an ISO 4217 currency code")
 	}
 
 	return errors
