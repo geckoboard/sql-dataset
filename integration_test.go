@@ -107,7 +107,3 @@ func TestEndToEndFlow(t *testing.T) {
 		gbWS.Close()
 	}
 }
-
-func setupGeckoboardMockServer(t *testing.T) {
-
-}

@@ -38,7 +38,12 @@ func (ds Dataset) BuildDataset(dc *DatabaseConfig) (DatasetRows, error) {
 			case NumberType:
 				data[k] = col.(*null.Int).Int64
 			case MoneyType, PercentageType:
-				data[k] = col.(*null.Float).Float64
+				val := col.(*null.Float).Float64
+				data[k] = val
+
+				if dc.Driver == MysqlDriver {
+					data[k] = float32(val)
+				}
 			case StringType:
 				data[k] = col.(*null.String).String
 			case DateType:
