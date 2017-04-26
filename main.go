@@ -34,6 +34,10 @@ func main() {
 		os.Exit(1)
 	}
 
+	if config.DatabaseConfig.Driver == models.MysqlDriver {
+		ConfigureMySQLDSN(config)
+	}
+
 	processAllDatasets(config)
 }
 

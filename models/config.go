@@ -27,8 +27,15 @@ type Config struct {
 // DatabaseConfig holds the db type, url
 // and other custom options such as tls config
 type DatabaseConfig struct {
-	Driver string `yaml:"driver"`
-	URL    string `yaml:"url"`
+	Driver    string     `yaml:"driver"`
+	URL       string     `yaml:"url"`
+	TLSConfig *TLSConfig `yaml:"tls_config"`
+}
+
+type TLSConfig struct {
+	KeyFile  string `yaml:"key_file"`
+	CertFile string `yaml:"cert"`
+	CAFile   string `yaml:"ca_cert"`
 }
 
 func LoadConfig(filepath string) (config *Config, err error) {
