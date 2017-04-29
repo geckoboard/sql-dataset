@@ -37,15 +37,16 @@ type Dataset struct {
 }
 
 type Field struct {
-	Type         FieldType `yaml:"type"`
-	Key          string    `yaml:"key"`
-	Name         string    `yaml:"name"`
-	CurrencyCode string    `yaml:currency_code`
+	Type           FieldType `yaml:"type"`
+	Key            string    `yaml:"key"`
+	Name           string    `yaml:"name"`
+	CurrencyCode   string    `yaml:currency_code`
+	FloatPrecision uint8     `yaml:"float_precision"`
 }
 
 // KeyValue returns the field key if present
 // otherwise by default returns the field name underscored
-func (f Field) KeyValue(fieldIdx int) string {
+func (f Field) KeyValue() string {
 	if f.Key != "" {
 		return f.Key
 	}

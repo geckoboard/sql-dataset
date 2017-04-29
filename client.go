@@ -40,8 +40,8 @@ func PushData(ds models.Dataset, rows models.DatasetRows, key string) (err error
 func remapFields(ds models.Dataset) (fields gb.Fields) {
 	fields = make(gb.Fields)
 
-	for i, f := range ds.Fields {
-		fields[f.KeyValue(i)] = gb.Field{
+	for _, f := range ds.Fields {
+		fields[f.KeyValue()] = gb.Field{
 			Name:         f.Name,
 			Type:         string(f.Type),
 			CurrencyCode: f.CurrencyCode,

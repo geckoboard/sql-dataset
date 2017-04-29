@@ -148,7 +148,7 @@ func TestBuildDataset(t *testing.T) {
 				},
 				Datasets: []Dataset{
 					{
-						SQL: "SELECT build_cost, created_at FROM builds GROUP BY app_name order by app_name",
+						SQL: "SELECT CAST(build_cost*100 AS INTEGER), created_at FROM builds GROUP BY app_name order by app_name",
 						Fields: []Field{
 							{Name: "Build Cost", Type: MoneyType},
 							{Name: "Day", Type: DateType},
@@ -162,23 +162,23 @@ func TestBuildDataset(t *testing.T) {
 			},
 			out: []map[string]interface{}{
 				{
-					"build_cost": 11.32,
+					"build_cost": int64(1132),
 					"day":        parseTime("2017-03-23T16:44:00Z", t).Format(dateFormat),
 				},
 				{
-					"build_cost": 0.54,
+					"build_cost": int64(54),
 					"day":        parseTime("2017-03-21T11:12:00Z", t).Format(dateFormat),
 				},
 				{
-					"build_cost": float64(0),
+					"build_cost": int64(0),
 					"day":        parseTime("2017-03-23T16:22:00Z", t).Format(dateFormat),
 				},
 				{
-					"build_cost": 1.11,
+					"build_cost": int64(111),
 					"day":        parseTime("2017-04-23T12:32:00Z", t).Format(dateFormat),
 				},
 				{
-					"build_cost": 2.64,
+					"build_cost": int64(264),
 					"day":        parseTime("2017-03-23T15:11:00Z", t).Format(dateFormat),
 				},
 			},
@@ -192,7 +192,7 @@ func TestBuildDataset(t *testing.T) {
 				},
 				Datasets: []Dataset{
 					{
-						SQL: "SELECT app_name, SUM(build_cost), updated_at FROM builds GROUP BY app_name order by app_name",
+						SQL: "SELECT app_name, CAST(SUM(build_cost)*100 AS INTEGER), updated_at FROM builds GROUP BY app_name order by app_name",
 						Fields: []Field{
 							{Name: "App", Type: StringType},
 							{Name: "Build Cost", Type: MoneyType},
@@ -209,27 +209,27 @@ func TestBuildDataset(t *testing.T) {
 			out: []map[string]interface{}{
 				{
 					"app":        "",
-					"build_cost": 11.32,
+					"build_cost": int64(1132),
 					"day":        parseTime("2017-03-23T00:00:00Z", t).Format(dateFormat),
 				},
 				{
 					"app":        "everdeen",
-					"build_cost": 0.54,
+					"build_cost": int64(54),
 					"day":        parseTime("2017-04-23T00:00:00Z", t).Format(dateFormat),
 				},
 				{
 					"app":        "geckoboard-ruby",
-					"build_cost": float64(0.48),
+					"build_cost": int64(48),
 					"day":        parseTime("2017-03-23T00:00:00Z", t).Format(dateFormat),
 				},
 				{
 					"app":        "react",
-					"build_cost": 1.11,
+					"build_cost": int64(111),
 					"day":        parseTime("2017-04-23T00:00:00Z", t).Format(dateFormat),
 				},
 				{
 					"app":        "westworld",
-					"build_cost": 2.64,
+					"build_cost": int64(264),
 					"day":        nil,
 				},
 			},
@@ -392,7 +392,7 @@ func TestBuildDatasetPostgresDriver(t *testing.T) {
 				},
 				Datasets: []Dataset{
 					{
-						SQL: "SELECT app_name, SUM(build_cost), created_at FROM builds GROUP BY app_name, created_at ORDER BY app_name",
+						SQL: "SELECT app_name, SUM(CAST(build_cost*100 AS INTEGER)), created_at FROM builds GROUP BY app_name, created_at ORDER BY app_name",
 						Fields: []Field{
 							{Name: "App", Type: StringType},
 							{Name: "Build Cost", Type: MoneyType},
@@ -404,37 +404,37 @@ func TestBuildDatasetPostgresDriver(t *testing.T) {
 			out: []map[string]interface{}{
 				{
 					"app":        "",
-					"build_cost": 11.32,
+					"build_cost": int64(1132),
 					"day":        parseTime("2017-03-23T16:44:00Z", t).Format(dateFormat),
 				},
 				{
 					"app":        "everdeen",
-					"build_cost": 0.54,
+					"build_cost": int64(54),
 					"day":        parseTime("2017-03-21T00:00:00Z", t).Format(dateFormat),
 				},
 				{
 					"app":        "geckoboard-ruby",
-					"build_cost": 0.24,
+					"build_cost": int64(24),
 					"day":        parseTime("2017-04-23T00:00:00Z", t).Format(dateFormat),
 				},
 				{
 					"app":        "geckoboard-ruby",
-					"build_cost": 0.74,
+					"build_cost": int64(74),
 					"day":        parseTime("2017-03-23T00:00:00Z", t).Format(dateFormat),
 				},
 				{
 					"app":        "geckoboard-ruby",
-					"build_cost": float64(0),
+					"build_cost": int64(0),
 					"day":        parseTime("2017-03-23T00:00:00Z", t).Format(dateFormat),
 				},
 				{
 					"app":        "react",
-					"build_cost": 1.11,
+					"build_cost": int64(111),
 					"day":        parseTime("2017-04-23T00:00:00Z", t).Format(dateFormat),
 				},
 				{
 					"app":        "westworld",
-					"build_cost": 2.64,
+					"build_cost": int64(264),
 					"day":        parseTime("2017-03-23T00:00:00Z", t).Format(dateFormat),
 				},
 			},
@@ -633,7 +633,7 @@ func TestBuildDatasetMysqlDriver(t *testing.T) {
 				},
 				Datasets: []Dataset{
 					{
-						SQL: "SELECT app_name, SUM(build_cost), created_at FROM builds GROUP BY app_name, created_at ORDER BY app_name",
+						SQL: "SELECT app_name, SUM(CAST(build_cost*100 AS SIGNED INTEGER)), created_at FROM builds GROUP BY app_name, created_at ORDER BY app_name",
 						Fields: []Field{
 							{Name: "App", Type: StringType},
 							{Name: "Build Cost", Type: MoneyType},
@@ -642,22 +642,76 @@ func TestBuildDatasetMysqlDriver(t *testing.T) {
 					},
 				},
 			},
-			// TODO: Mysql FLOAT is 32bit whereas DOUBLE is 64bit so we probably need
-			// a config option for floating pount data retrieval
 			out: []map[string]interface{}{
 				{
 					"app":        "",
-					"build_cost": float32(11.32),
+					"build_cost": int64(1132),
 					"day":        parseTime("2017-03-23T16:44:00Z", t).Format(dateFormat),
 				},
 				{
 					"app":        "everdeen",
-					"build_cost": float32(0.54),
+					"build_cost": int64(54),
 					"day":        parseTime("2017-03-21T00:00:00Z", t).Format(dateFormat),
 				},
 				{
 					"app":        "geckoboard-ruby",
-					"build_cost": float32(0.74),
+					"build_cost": int64(74),
+					"day":        parseTime("2017-03-23T00:00:00Z", t).Format(dateFormat),
+				},
+				{
+					"app":        "geckoboard-ruby",
+					"build_cost": int64(0),
+					"day":        parseTime("2017-03-23T00:00:00Z", t).Format(dateFormat),
+				},
+				{
+					"app":        "geckoboard-ruby",
+					"build_cost": int64(24),
+					"day":        parseTime("2017-04-23T00:00:00Z", t).Format(dateFormat),
+				},
+				{
+					"app":        "react",
+					"build_cost": int64(111),
+					"day":        parseTime("2017-04-23T00:00:00Z", t).Format(dateFormat),
+				},
+				{
+					"app":        "westworld",
+					"build_cost": int64(264),
+					"day":        parseTime("2017-03-23T00:00:00Z", t).Format(dateFormat),
+				},
+			},
+			err: "",
+		},
+		{
+			config: Config{
+				DatabaseConfig: &DatabaseConfig{
+					Driver: MysqlDriver,
+					URL:    env,
+				},
+				Datasets: []Dataset{
+					{
+						SQL: "SELECT app_name, SUM(build_cost/10), created_at FROM builds GROUP BY app_name, created_at ORDER BY app_name",
+						Fields: []Field{
+							{Name: "App", Type: StringType},
+							{Name: "Build Cost", Type: PercentageType, FloatPrecision: 32},
+							{Name: "Day", Type: DateType},
+						},
+					},
+				},
+			},
+			out: []map[string]interface{}{
+				{
+					"app":        "",
+					"build_cost": float32(1.132),
+					"day":        parseTime("2017-03-23T16:44:00Z", t).Format(dateFormat),
+				},
+				{
+					"app":        "everdeen",
+					"build_cost": float32(0.054),
+					"day":        parseTime("2017-03-21T00:00:00Z", t).Format(dateFormat),
+				},
+				{
+					"app":        "geckoboard-ruby",
+					"build_cost": float32(0.074),
 					"day":        parseTime("2017-03-23T00:00:00Z", t).Format(dateFormat),
 				},
 				{
@@ -667,17 +721,17 @@ func TestBuildDatasetMysqlDriver(t *testing.T) {
 				},
 				{
 					"app":        "geckoboard-ruby",
-					"build_cost": float32(0.24),
+					"build_cost": float32(0.024),
 					"day":        parseTime("2017-04-23T00:00:00Z", t).Format(dateFormat),
 				},
 				{
 					"app":        "react",
-					"build_cost": float32(1.11),
+					"build_cost": float32(0.111),
 					"day":        parseTime("2017-04-23T00:00:00Z", t).Format(dateFormat),
 				},
 				{
 					"app":        "westworld",
-					"build_cost": float32(2.64),
+					"build_cost": float32(0.264),
 					"day":        parseTime("2017-03-23T00:00:00Z", t).Format(dateFormat),
 				},
 			},

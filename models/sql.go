@@ -33,16 +33,30 @@ func (ds Dataset) BuildDataset(dc *DatabaseConfig) (DatasetRows, error) {
 		data := make(map[string]interface{})
 
 		for i, col := range row.([]interface{}) {
-			k := ds.Fields[i].KeyValue(i)
-			switch ds.Fields[i].Type {
-			case NumberType:
-				data[k] = col.(*null.Int).Int64
-			case MoneyType, PercentageType:
-				val := col.(*null.Float).Float64
-				data[k] = val
+			f := ds.Fields[i]
+			k := f.KeyValue()
 
-				if dc.Driver == MysqlDriver {
+			switch f.Type {
+			case NumberType:
+				if f.FloatPrecision != 0 {
+					val := col.(*null.Float).Float64
+					if f.FloatPrecision == 32 {
+						data[k] = float32(val)
+					} else {
+						data[k] = val
+					}
+				} else {
+					data[k] = col.(*null.Int).Int64
+				}
+			case MoneyType:
+				data[k] = col.(*null.Int).Int64
+			case PercentageType:
+				val := col.(*null.Float).Float64
+
+				if f.FloatPrecision == 32 {
 					data[k] = float32(val)
+				} else {
+					data[k] = val
 				}
 			case StringType:
 				data[k] = col.(*null.String).String
@@ -108,9 +122,16 @@ func (ds Dataset) queryDatasource(dc *DatabaseConfig) (records []interface{}, er
 func (f Field) fieldTypeMapping() interface{} {
 	switch f.Type {
 	case NumberType:
+		if f.FloatPrecision != 0 {
+			var x null.Float
+			return &x
+		}
 		var x null.Int
 		return &x
-	case MoneyType, PercentageType:
+	case MoneyType:
+		var x null.Int
+		return &x
+	case PercentageType:
 		var x null.Float
 		return &x
 	case StringType:
