@@ -56,7 +56,7 @@ func TestEndToEndFlow(t *testing.T) {
 				},
 				{
 					Path: "/datasets/app.counts/data",
-					Body: `{"data":[{"app":"","build_count":1},{"app":"everdeen","build_count":1},{"app":"geckoboard-ruby","build_count":3},{"app":"react","build_count":1},{"app":"westworld","build_count":1}]}`,
+					Body: `{"data":[{"app":"","build_count":2},{"app":"everdeen","build_count":2},{"app":"geckoboard-ruby","build_count":3},{"app":"react","build_count":1},{"app":"westworld","build_count":1}]}`,
 				},
 				{
 					Path: "/datasets/app.build.costs",
@@ -64,7 +64,7 @@ func TestEndToEndFlow(t *testing.T) {
 				},
 				{
 					Path: "/datasets/app.build.costs/data",
-					Body: `{"data":[{"app":"","build_cost":1132},{"app":"everdeen","build_cost":54},{"app":"geckoboard-ruby","build_cost":0},{"app":"react","build_cost":111},{"app":"westworld","build_cost":264}]}`,
+					Body: `{"data":[{"app":"","build_cost":1132},{"app":"everdeen","build_cost":144},{"app":"geckoboard-ruby","build_cost":0},{"app":"react","build_cost":111},{"app":"westworld","build_cost":264}]}`,
 				},
 			},
 		},
