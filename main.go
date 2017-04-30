@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/geckoboard/sql-dataset/models"
 )
@@ -38,7 +39,16 @@ func main() {
 		ConfigureMySQLDSN(config)
 	}
 
-	processAllDatasets(config)
+	if config.RefreshTimeSec == 0 {
+		fmt.Println("No refresh timer specified will process once and exit\n")
+		processAllDatasets(config)
+	} else {
+		fmt.Printf("Refresh timer specified run every %d seconds until interrupted\n\n", config.RefreshTimeSec)
+		for {
+			processAllDatasets(config)
+			time.Sleep(time.Duration(config.RefreshTimeSec) * time.Second)
+		}
+	}
 }
 
 func processAllDatasets(config *models.Config) (hasErrored bool) {
