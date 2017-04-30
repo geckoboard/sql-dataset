@@ -23,8 +23,9 @@ func PushData(ds models.Dataset, rows models.DatasetRows, key string) (err error
 
 	// Create & push dataset schema
 	dataset := gb.DataSet{
-		ID:     ds.Name,
-		Fields: remapFields(ds),
+		ID:       ds.Name,
+		UniqueBy: ds.UniqueBy,
+		Fields:   remapFields(ds),
 	}
 
 	err = dataset.FindOrCreate(gbClient)

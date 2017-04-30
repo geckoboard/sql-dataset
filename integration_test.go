@@ -145,6 +145,37 @@ func TestEndToEndFlow(t *testing.T) {
 				},
 			},
 		},
+		{
+			// Unique by correctly used and sent - doesn't do validation used with the correct update type
+			config: models.Config{
+				DatabaseConfig: &models.DatabaseConfig{
+					Driver: models.SQLiteDriver,
+					URL:    filepath.Join("models", "fixtures", "db.sqlite"),
+				},
+				Datasets: []models.Dataset{
+					{
+						Name:       "app.counts",
+						SQL:        "SELECT app_name, count(*) FROM builds GROUP BY app_name order by app_name",
+						UpdateType: models.Append,
+						UniqueBy:   []string{"app_name"},
+						Fields: []models.Field{
+							{Name: "App", Type: models.StringType},
+							{Name: "Build Count", Type: models.NumberType},
+						},
+					},
+				},
+			},
+			gbReqs: []GBRequest{
+				{
+					Path: "/datasets/app.counts",
+					Body: `{"id":"app.counts","fields":{"app":{"name":"App","type":"string","currency_code":""},"build_count":{"name":"Build Count","type":"number","currency_code":""}},"unique_by":["app_name"],"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`,
+				},
+				{
+					Path: "/datasets/app.counts/data",
+					Body: `{"data":[{"app":"","build_count":2},{"app":"everdeen","build_count":2},{"app":"geckoboard-ruby","build_count":3},{"app":"react","build_count":1},{"app":"westworld","build_count":1}]}`,
+				},
+			},
+		},
 	}
 
 	for i, tc := range testCases {

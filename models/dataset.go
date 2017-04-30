@@ -32,6 +32,7 @@ var fieldTypes = []FieldType{
 type Dataset struct {
 	Name       string      `yaml:"name"`
 	UpdateType DatasetType `yaml:"update_type"`
+	UniqueBy   []string    `yaml:"unique_by"`
 	SQL        string      `yaml:"sql"`
 	Fields     []Field     `yaml:"fields"`
 }
