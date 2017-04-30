@@ -63,7 +63,7 @@ func (ds Dataset) BuildDataset(dc *DatabaseConfig) (DatasetRows, error) {
 			case DateType:
 				d := col.(*null.Time)
 				if d.Valid {
-					data[k] = d.Time.Format("2006-01-02")
+					data[k] = d.Time.Format(dateFormat)
 				} else {
 					data[k] = nil
 				}
