@@ -9,8 +9,8 @@
 		},
 		{
 			"ImportPath": "github.com/go-sql-driver/mysql",
-			"Comment": "v1.3-7-g15dbaae",
-			"Rev": "15dbaaedd46b79251eaa9c8ed5f280d28978bb3f"
+			"Comment": "v1.3-14-gae5a66d",
+			"Rev": "ae5a66df4d33ba404d639bd0fc9189cd5ee79bcf"
 		},
 		{
 			"ImportPath": "github.com/lib/pq",
