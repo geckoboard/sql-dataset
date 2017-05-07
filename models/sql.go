@@ -28,7 +28,6 @@ func (ds Dataset) BuildDataset(dc *DatabaseConfig) (DatasetRows, error) {
 		return nil, err
 	}
 
-	//TODO: Allow nulls on the datatypes that support it in Geckoboard
 	for _, row := range recs {
 		data := make(map[string]interface{})
 
@@ -37,27 +36,8 @@ func (ds Dataset) BuildDataset(dc *DatabaseConfig) (DatasetRows, error) {
 			k := f.KeyValue()
 
 			switch f.Type {
-			case NumberType:
-				if f.FloatPrecision != 0 {
-					val := col.(*null.Float).Float64
-					if f.FloatPrecision == 32 {
-						data[k] = float32(val)
-					} else {
-						data[k] = val
-					}
-				} else {
-					data[k] = col.(*null.Int).Int64
-				}
-			case MoneyType:
-				data[k] = col.(*null.Int).Int64
-			case PercentageType:
-				val := col.(*null.Float).Float64
-
-				if f.FloatPrecision == 32 {
-					data[k] = float32(val)
-				} else {
-					data[k] = val
-				}
+			case NumberType, MoneyType, PercentageType:
+				data[k] = col.(*Number).Value()
 			case StringType:
 				data[k] = col.(*null.String).String
 			case DateType:
@@ -121,18 +101,8 @@ func (ds Dataset) queryDatasource(dc *DatabaseConfig) (records []interface{}, er
 
 func (f Field) fieldTypeMapping() interface{} {
 	switch f.Type {
-	case NumberType:
-		if f.FloatPrecision != 0 {
-			var x null.Float
-			return &x
-		}
-		var x null.Int
-		return &x
-	case MoneyType:
-		var x null.Int
-		return &x
-	case PercentageType:
-		var x null.Float
+	case NumberType, MoneyType, PercentageType:
+		var x Number
 		return &x
 	case StringType:
 		var x null.String
