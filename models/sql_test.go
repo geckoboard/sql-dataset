@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -55,7 +56,7 @@ func TestBuildDatasetSQLiteDriver(t *testing.T) {
 				},
 			},
 			out: nil,
-			err: `Scan failed: sql: Scan error on column index 0: converting driver.Value type []uint8 ("") to a int64: invalid syntax`,
+			err: `Scan failed: sql: Scan error on column index 0: strconv.ParseInt: parsing "everdeen": invalid syntax`,
 		},
 		{
 			config: Config{
@@ -168,11 +169,11 @@ func TestBuildDatasetSQLiteDriver(t *testing.T) {
 				},
 				{
 					"day":        parseTime("2017-03-23T00:00:00Z", t).Format(dateFormat),
-					"build_cost": int64(0),
+					"build_cost": 0,
 				},
 				{
 					"day":        parseTime("2017-03-23T00:00:00Z", t).Format(dateFormat),
-					"build_cost": int64(0),
+					"build_cost": 0,
 				},
 				{
 					"day":        parseTime("2017-03-23T00:00:00Z", t).Format(dateFormat),
@@ -286,7 +287,7 @@ func TestBuildDatasetSQLiteDriver(t *testing.T) {
 				},
 				{
 					"app": "geckoboard-ruby",
-					"percentage_completed": 0.00,
+					"percentage_completed": 0,
 				},
 				{
 					"app": "geckoboard-ruby",
@@ -302,7 +303,7 @@ func TestBuildDatasetSQLiteDriver(t *testing.T) {
 				},
 				{
 					"app": "westworld",
-					"percentage_completed": 0.00,
+					"percentage_completed": 0,
 				},
 			},
 			err: "",
@@ -320,7 +321,7 @@ func TestBuildDatasetSQLiteDriver(t *testing.T) {
 						Fields: []Field{
 							{Name: "App", Type: StringType},
 							{Name: "Date", Type: DateType},
-							{Name: "Run time", Type: NumberType, FloatPrecision: 64},
+							{Name: "Run time", Type: NumberType},
 						},
 					},
 				},
@@ -339,7 +340,7 @@ func TestBuildDatasetSQLiteDriver(t *testing.T) {
 				{
 					"app":      "geckoboard-ruby",
 					"date":     parseTime("2017-03-23T00:00:00Z", t).Format(dateFormat),
-					"run_time": 0.00,
+					"run_time": 0,
 				},
 				{
 					"app":      "geckoboard-ruby",
@@ -365,8 +366,6 @@ func TestBuildDatasetSQLiteDriver(t *testing.T) {
 			err: "",
 		},
 		{
-			// Float precision specified as 32 losing detail from the returned float value
-			// Also date is returned as null explicitly
 			config: Config{
 				DatabaseConfig: &DatabaseConfig{
 					Driver: SQLiteDriver,
@@ -374,11 +373,11 @@ func TestBuildDatasetSQLiteDriver(t *testing.T) {
 				},
 				Datasets: []Dataset{
 					{
-						SQL: "SELECT app_name, null, run_time FROM builds order by created_at limit 1",
+						SQL: "SELECT app_name, null, ROUND(run_time, 7) FROM builds order by created_at limit 1",
 						Fields: []Field{
 							{Name: "App", Type: StringType},
 							{Name: "Date", Type: DateType},
-							{Name: "Run time", Type: NumberType, FloatPrecision: 32},
+							{Name: "Run time", Type: NumberType},
 						},
 					},
 				},
@@ -387,7 +386,7 @@ func TestBuildDatasetSQLiteDriver(t *testing.T) {
 				{
 					"app":      "everdeen",
 					"date":     nil,
-					"run_time": float32(0.31882277),
+					"run_time": 0.3188228,
 				},
 			},
 			err: "",
@@ -489,7 +488,7 @@ func TestBuildDatasetPostgresDriver(t *testing.T) {
 				},
 			},
 			out: nil,
-			err: `Scan failed: sql: Scan error on column index 0: converting driver.Value type string ("") to a int64: invalid syntax`,
+			err: `Scan failed: sql: Scan error on column index 0: can't convert string "" to number`,
 		},
 		{
 			config: Config{
@@ -700,7 +699,7 @@ func TestBuildDatasetPostgresDriver(t *testing.T) {
 				},
 				{
 					"app": "geckoboard-ruby",
-					"percentage_completed": 0.00,
+					"percentage_completed": 0,
 				},
 				{
 					"app": "geckoboard-ruby",
@@ -712,7 +711,7 @@ func TestBuildDatasetPostgresDriver(t *testing.T) {
 				},
 				{
 					"app": "westworld",
-					"percentage_completed": 0.00,
+					"percentage_completed": 0,
 				},
 			},
 			err: "",
@@ -730,7 +729,7 @@ func TestBuildDatasetPostgresDriver(t *testing.T) {
 						Fields: []Field{
 							{Name: "App", Type: StringType},
 							{Name: "Date", Type: DateType},
-							{Name: "Run time", Type: NumberType, FloatPrecision: 64},
+							{Name: "Run time", Type: NumberType},
 						},
 					},
 				},
@@ -749,7 +748,7 @@ func TestBuildDatasetPostgresDriver(t *testing.T) {
 				{
 					"app":      "geckoboard-ruby",
 					"date":     parseTime("2017-03-23T00:00:00Z", t).Format(dateFormat),
-					"run_time": 0.00,
+					"run_time": 0,
 				},
 				{
 					"app":      "geckoboard-ruby",
@@ -775,8 +774,6 @@ func TestBuildDatasetPostgresDriver(t *testing.T) {
 			err: "",
 		},
 		{
-			// Float precision specified as 32 losing detail from the returned float value
-			// Also date is returned as null explicitly
 			config: Config{
 				DatabaseConfig: &DatabaseConfig{
 					Driver: PostgresDriver,
@@ -784,11 +781,11 @@ func TestBuildDatasetPostgresDriver(t *testing.T) {
 				},
 				Datasets: []Dataset{
 					{
-						SQL: "SELECT app_name, null, run_time FROM builds order by created_at limit 1",
+						SQL: "SELECT app_name, null, ROUND(CAST(run_time AS NUMERIC), 7) FROM builds order by created_at limit 1",
 						Fields: []Field{
 							{Name: "App", Type: StringType},
 							{Name: "Date", Type: DateType},
-							{Name: "Run time", Type: NumberType, FloatPrecision: 32},
+							{Name: "Run time", Type: NumberType},
 						},
 					},
 				},
@@ -797,7 +794,7 @@ func TestBuildDatasetPostgresDriver(t *testing.T) {
 				{
 					"app":      "everdeen",
 					"date":     nil,
-					"run_time": float32(0.318822772),
+					"run_time": 0.3188228,
 				},
 			},
 			err: "",
@@ -816,7 +813,7 @@ func TestBuildDatasetPostgresDriver(t *testing.T) {
 		}
 
 		if len(out) != len(tc.out) {
-			t.Errorf("[%d] Expected slice size %d but got %d", idx, len(tc.out), len(out))
+			t.Errorf("[%d] Expected slice size %d but got %#v", idx, len(tc.out), out)
 			continue
 		}
 
@@ -899,7 +896,7 @@ func TestBuildDatasetMysqlDriver(t *testing.T) {
 				},
 			},
 			out: nil,
-			err: `Scan failed: sql: Scan error on column index 0: converting driver.Value type []uint8 ("") to a int64: invalid syntax`,
+			err: `Scan failed: sql: Scan error on column index 0: strconv.ParseInt: parsing "everdeen": invalid syntax`,
 		},
 		{
 			config: Config{
@@ -1106,7 +1103,7 @@ func TestBuildDatasetMysqlDriver(t *testing.T) {
 				},
 				{
 					"app": "geckoboard-ruby",
-					"percentage_completed": 0.00,
+					"percentage_completed": 0,
 				},
 				{
 					"app": "geckoboard-ruby",
@@ -1122,7 +1119,7 @@ func TestBuildDatasetMysqlDriver(t *testing.T) {
 				},
 				{
 					"app": "westworld",
-					"percentage_completed": 0.00,
+					"percentage_completed": 0,
 				},
 			},
 			err: "",
@@ -1140,7 +1137,7 @@ func TestBuildDatasetMysqlDriver(t *testing.T) {
 						Fields: []Field{
 							{Name: "App", Type: StringType},
 							{Name: "Date", Type: DateType},
-							{Name: "Run time", Type: NumberType, FloatPrecision: 64},
+							{Name: "Run time", Type: NumberType},
 						},
 					},
 				},
@@ -1159,7 +1156,7 @@ func TestBuildDatasetMysqlDriver(t *testing.T) {
 				{
 					"app":      "geckoboard-ruby",
 					"date":     parseTime("2017-03-23T00:00:00Z", t).Format(dateFormat),
-					"run_time": 0.00,
+					"run_time": 0,
 				},
 				{
 					"app":      "geckoboard-ruby",
@@ -1185,8 +1182,6 @@ func TestBuildDatasetMysqlDriver(t *testing.T) {
 			err: "",
 		},
 		{
-			// Float precision specified as 32 losing detail from the returned float value
-			// Also date is returned as null explicitly
 			config: Config{
 				DatabaseConfig: &DatabaseConfig{
 					Driver: MysqlDriver,
@@ -1194,11 +1189,11 @@ func TestBuildDatasetMysqlDriver(t *testing.T) {
 				},
 				Datasets: []Dataset{
 					{
-						SQL: "SELECT app_name, null, run_time FROM builds order by created_at limit 1",
+						SQL: "SELECT app_name, null, ROUND(run_time, 7) FROM builds order by created_at limit 1",
 						Fields: []Field{
 							{Name: "App", Type: StringType},
 							{Name: "Date", Type: DateType},
-							{Name: "Run time", Type: NumberType, FloatPrecision: 32},
+							{Name: "Run time", Type: NumberType},
 						},
 					},
 				},
@@ -1207,7 +1202,7 @@ func TestBuildDatasetMysqlDriver(t *testing.T) {
 				{
 					"app":      "everdeen",
 					"date":     nil,
-					"run_time": float32(0.318822772),
+					"run_time": 0.3188228,
 				},
 			},
 			err: "",
@@ -1226,6 +1221,7 @@ func TestBuildDatasetMysqlDriver(t *testing.T) {
 		}
 
 		if len(out) != len(tc.out) {
+			fmt.Printf("%#v\n", out)
 			t.Errorf("[%d] Expected slice size %d but got %d", idx, len(tc.out), len(out))
 			continue
 		}
@@ -1239,303 +1235,6 @@ func TestBuildDatasetMysqlDriver(t *testing.T) {
 		}
 	}
 }
-
-// func TestBuildDatasetMysqlDriver(t *testing.T) {
-// 	// Setup the postgres and run the insert
-// 	env, ok := os.LookupEnv("MYSQL_URL")
-// 	if !ok {
-// 		t.Errorf("This test requires real mysql db using env:MYSQL_URL ensure the db exists" +
-// 			" eg. [username[:password]@][protocol[(address)]]/dbname[?parseTime=true]")
-//
-// 		return
-// 	}
-//
-// 	db, err := sql.Open("mysql", env)
-// 	contents, err := ioutil.ReadFile("fixtures/insert_mysql.sql")
-// 	if err != nil {
-// 		t.Fatal(err)
-// 	}
-//
-// 	queries := strings.Split(string(contents), ";")
-//
-// 	for _, query := range queries {
-// 		if _, err = db.Exec(query); err != nil {
-// 			t.Fatal(err)
-// 		}
-// 	}
-//
-// 	testCases := []struct {
-// 		config Config
-// 		out    []map[string]interface{}
-// 		err    string
-// 	}{
-// 		{
-// 			config: Config{
-// 				DatabaseConfig: &DatabaseConfig{
-// 					Driver: MysqlDriver,
-// 					URL:    env,
-// 				},
-// 				Datasets: []Dataset{
-// 					{
-// 						SQL: "SELECT app_name, count(*) FROM builds GROUP BY app_name order by app_name",
-// 						Fields: []Field{
-// 							{Name: "App", Type: NumberType},
-// 							{Name: "Build Count", Type: NumberType},
-// 						},
-// 					},
-// 				},
-// 			},
-// 			out: nil,
-// 			err: `Scan failed: sql: Scan error on column index 0: converting driver.Value type []uint8 ("") to a int64: invalid syntax`,
-// 		},
-// 		{
-// 			config: Config{
-// 				DatabaseConfig: &DatabaseConfig{
-// 					Driver: MysqlDriver,
-// 					URL:    env,
-// 				},
-// 				Datasets: []Dataset{
-// 					{
-// 						SQL: "SELECT app_name, create_at FROM builds order by app_name",
-// 						Fields: []Field{
-// 							{Name: "App", Type: StringType},
-// 							{Name: "Build Date", Type: DatetimeType},
-// 						},
-// 					},
-// 				},
-// 			},
-// 			out: nil,
-// 			err: `Database query failed: Error 1054: Unknown column 'create_at' in 'field list'`,
-// 		},
-// 		{
-// 			config: Config{
-// 				DatabaseConfig: &DatabaseConfig{
-// 					Driver: MysqlDriver,
-// 					URL:    env,
-// 				},
-// 				Datasets: []Dataset{
-// 					{
-// 						SQL: "SELECT app_name, build_cost, created_at FROM builds",
-// 						Fields: []Field{
-// 							{Name: "App", Type: StringType},
-// 							{Name: "Build Count", Type: NumberType},
-// 						},
-// 					},
-// 				},
-// 			},
-// 			out: nil,
-// 			err: "Scan failed: sql: expected 3 destination arguments in Scan, not 2",
-// 		},
-// 		{
-// 			config: Config{
-// 				DatabaseConfig: &DatabaseConfig{
-// 					Driver: MysqlDriver,
-// 					URL:    env,
-// 				},
-// 				Datasets: []Dataset{
-// 					{
-// 						SQL: "SELECT app_name, count(*) FROM builds GROUP BY app_name order by app_name",
-// 						Fields: []Field{
-// 							{Name: "App", Type: StringType},
-// 							{Name: "Build Count", Type: NumberType},
-// 						},
-// 					},
-// 				},
-// 			},
-// 			out: []map[string]interface{}{
-// 				{
-// 					"app":         "",
-// 					"build_count": int64(1),
-// 				},
-// 				{
-// 					"app":         "everdeen",
-// 					"build_count": int64(1),
-// 				},
-// 				{
-// 					"app":         "geckoboard-ruby",
-// 					"build_count": int64(3),
-// 				},
-// 				{
-// 					"app":         "react",
-// 					"build_count": int64(1),
-// 				},
-// 				{
-// 					"app":         "westworld",
-// 					"build_count": int64(1),
-// 				},
-// 			},
-// 			err: "",
-// 		},
-// 		{
-// 			config: Config{
-// 				DatabaseConfig: &DatabaseConfig{
-// 					Driver: MysqlDriver,
-// 					URL:    env,
-// 				},
-// 				Datasets: []Dataset{
-// 					{
-// 						SQL: "SELECT app_name, SUM(CAST(build_cost*100 AS SIGNED INTEGER)), created_at FROM builds GROUP BY app_name, created_at ORDER BY app_name",
-// 						Fields: []Field{
-// 							{Name: "App", Type: StringType},
-// 							{Name: "Build Cost", Type: MoneyType},
-// 							{Name: "Day", Type: DateType},
-// 						},
-// 					},
-// 				},
-// 			},
-// 			out: []map[string]interface{}{
-// 				{
-// 					"app":        "",
-// 					"build_cost": int64(1132),
-// 					"day":        parseTime("2017-03-23T16:44:00Z", t).Format(dateFormat),
-// 				},
-// 				{
-// 					"app":        "everdeen",
-// 					"build_cost": int64(54),
-// 					"day":        parseTime("2017-03-21T00:00:00Z", t).Format(dateFormat),
-// 				},
-// 				{
-// 					"app":        "geckoboard-ruby",
-// 					"build_cost": int64(74),
-// 					"day":        parseTime("2017-03-23T00:00:00Z", t).Format(dateFormat),
-// 				},
-// 				{
-// 					"app":        "geckoboard-ruby",
-// 					"build_cost": int64(0),
-// 					"day":        parseTime("2017-03-23T00:00:00Z", t).Format(dateFormat),
-// 				},
-// 				{
-// 					"app":        "geckoboard-ruby",
-// 					"build_cost": int64(24),
-// 					"day":        parseTime("2017-04-23T00:00:00Z", t).Format(dateFormat),
-// 				},
-// 				{
-// 					"app":        "react",
-// 					"build_cost": int64(111),
-// 					"day":        parseTime("2017-04-23T00:00:00Z", t).Format(dateFormat),
-// 				},
-// 				{
-// 					"app":        "westworld",
-// 					"build_cost": int64(264),
-// 					"day":        parseTime("2017-03-23T00:00:00Z", t).Format(dateFormat),
-// 				},
-// 			},
-// 			err: "",
-// 		},
-// 		{
-// 			config: Config{
-// 				DatabaseConfig: &DatabaseConfig{
-// 					Driver: MysqlDriver,
-// 					URL:    env,
-// 				},
-// 				Datasets: []Dataset{
-// 					{
-// 						SQL: "SELECT app_name, SUM(build_cost/10), created_at FROM builds GROUP BY app_name, created_at ORDER BY app_name",
-// 						Fields: []Field{
-// 							{Name: "App", Type: StringType},
-// 							{Name: "Build Cost", Type: PercentageType, FloatPrecision: 32},
-// 							{Name: "Day", Type: DateType},
-// 						},
-// 					},
-// 				},
-// 			},
-// 			out: []map[string]interface{}{
-// 				{
-// 					"app":        "",
-// 					"build_cost": float32(1.132),
-// 					"day":        parseTime("2017-03-23T16:44:00Z", t).Format(dateFormat),
-// 				},
-// 				{
-// 					"app":        "everdeen",
-// 					"build_cost": float32(0.054),
-// 					"day":        parseTime("2017-03-21T00:00:00Z", t).Format(dateFormat),
-// 				},
-// 				{
-// 					"app":        "geckoboard-ruby",
-// 					"build_cost": float32(0.074),
-// 					"day":        parseTime("2017-03-23T00:00:00Z", t).Format(dateFormat),
-// 				},
-// 				{
-// 					"app":        "geckoboard-ruby",
-// 					"build_cost": float32(0),
-// 					"day":        parseTime("2017-03-23T00:00:00Z", t).Format(dateFormat),
-// 				},
-// 				{
-// 					"app":        "geckoboard-ruby",
-// 					"build_cost": float32(0.024),
-// 					"day":        parseTime("2017-04-23T00:00:00Z", t).Format(dateFormat),
-// 				},
-// 				{
-// 					"app":        "react",
-// 					"build_cost": float32(0.111),
-// 					"day":        parseTime("2017-04-23T00:00:00Z", t).Format(dateFormat),
-// 				},
-// 				{
-// 					"app":        "westworld",
-// 					"build_cost": float32(0.264),
-// 					"day":        parseTime("2017-03-23T00:00:00Z", t).Format(dateFormat),
-// 				},
-// 			},
-// 			err: "",
-// 		},
-// 		{
-// 			config: Config{
-// 				DatabaseConfig: &DatabaseConfig{
-// 					Driver: MysqlDriver,
-// 					URL:    env,
-// 				},
-// 				Datasets: []Dataset{
-// 					{
-// 						SQL: "SELECT app_name, updated_at FROM builds ORDER BY app_name LIMIT 4",
-// 						Fields: []Field{
-// 							{Name: "App", Type: StringType},
-// 							{Name: "Day", Type: DatetimeType},
-// 						},
-// 					},
-// 				},
-// 			},
-// 			out: []map[string]interface{}{
-// 				{
-// 					"app": "",
-// 					"day": parseTime("2017-03-23T16:45:00Z", t).Format(time.RFC3339),
-// 				},
-// 				{
-// 					"app": "everdeen",
-// 					"day": parseTime("2017-04-23T11:14:00Z", t).Format(time.RFC3339),
-// 				},
-// 				{
-// 					"app": "geckoboard-ruby",
-// 					"day": parseTime("2017-04-23T13:42:00Z", t).Format(time.RFC3339),
-// 				},
-// 				{
-// 					"app": "geckoboard-ruby",
-// 					"day": parseTime("2017-03-23T17:11:00Z", t).Format(time.RFC3339),
-// 				},
-// 			},
-// 			err: "",
-// 		},
-// 	}
-//
-// 	for idx, tc := range testCases {
-// 		out, err := tc.config.Datasets[0].BuildDataset(tc.config.DatabaseConfig)
-//
-// 		if tc.err == "" && err != nil {
-// 			t.Errorf("[%d] Expected no error but got %s", idx, err)
-// 		}
-//
-// 		if err != nil && tc.err != err.Error() {
-// 			t.Errorf("[%d] Expected error %s but got %s", idx, tc.err, err)
-// 		}
-//
-// 		for i, mp := range out {
-// 			for k, v := range mp {
-// 				if tc.out[i][k] != v {
-// 					t.Errorf("[%d-%d] Expected key '%s' to have value %v but got %v", idx, i, k, tc.out[i][k], v)
-// 				}
-// 			}
-// 		}
-// 	}
-// }
 
 func parseTime(str string, t *testing.T) time.Time {
 	tme, err := time.Parse(time.RFC3339, str)

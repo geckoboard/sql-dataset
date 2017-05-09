@@ -88,7 +88,7 @@ func TestEndToEndFlow(t *testing.T) {
 						UpdateType: models.Replace,
 						Fields: []models.Field{
 							{Name: "App", Type: models.StringType},
-							{Name: "Run time", Type: models.NumberType, FloatPrecision: 64},
+							{Name: "Run time", Type: models.NumberType},
 						},
 					},
 				},
@@ -120,7 +120,7 @@ func TestEndToEndFlow(t *testing.T) {
 						UpdateType: models.Append,
 						Fields: []models.Field{
 							{Name: "App", Type: models.StringType},
-							{Name: "Run time", Type: models.NumberType, FloatPrecision: 64},
+							{Name: "Run time", Type: models.NumberType},
 						},
 					},
 				},
