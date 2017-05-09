@@ -27,15 +27,23 @@ type Config struct {
 // DatabaseConfig holds the db type, url
 // and other custom options such as tls config
 type DatabaseConfig struct {
-	Driver    string     `yaml:"driver"`
-	URL       string     `yaml:"url"`
-	TLSConfig *TLSConfig `yaml:"tls_config"`
+	Driver    string            `yaml:"driver"`
+	URL       string            `yaml:"-"`
+	Host      string            `yaml:"host"`
+	Port      string            `yaml:"port"`
+	Protocol  string            `yaml:"protocol"`
+	Database  string            `yaml:"database"`
+	Username  string            `yaml:"username"`
+	Password  string            `yaml:"password"`
+	TLSConfig *TLSConfig        `yaml:"tls_config"`
+	Params    map[string]string `yaml:"params"`
 }
 
 type TLSConfig struct {
 	KeyFile  string `yaml:"key_file"`
 	CertFile string `yaml:"cert"`
 	CAFile   string `yaml:"ca_cert"`
+	SSLMode  string `yaml:"ssl_mode"`
 }
 
 func LoadConfig(filepath string) (config *Config, err error) {
@@ -90,10 +98,6 @@ func (dc DatabaseConfig) Validate() (errors []string) {
 		if !matched {
 			errors = append(errors, fmt.Sprintf("Unsupported driver '%s' only %s are supported", dc.Driver, supportedDrivers))
 		}
-	}
-
-	if dc.URL == "" {
-		errors = append(errors, "Database url is required")
 	}
 
 	return errors

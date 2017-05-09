@@ -28,7 +28,6 @@ func TestValidate(t *testing.T) {
 			[]string{
 				"Geckoboard api key is required",
 				"Database driver is required",
-				"Database url is required",
 			},
 		},
 		{
