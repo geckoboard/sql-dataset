@@ -15,7 +15,7 @@ const (
 
 var (
 	ErrDatabaseRequired = errors.New("Database is required for a connection")
-	ErrUsernameRequired = errors.New("User is required for a connection")
+	ErrUsernameRequired = errors.New("Username is required for a connection")
 )
 
 type DSNBuilder interface {

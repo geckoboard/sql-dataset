@@ -1,6 +1,7 @@
 package drivers
 
 import (
+	"fmt"
 	"path/filepath"
 	"testing"
 
@@ -190,6 +191,129 @@ func TestNewDSNBuilder(t *testing.T) {
 				},
 			},
 			out: "root:fp123@tcp(localhost:3306)/someDB?parseTime=true&tls=customCert",
+		},
+		//Postgres Driver
+		{
+			in: models.DatabaseConfig{
+				Driver: models.PostgresDriver,
+			},
+			err: ErrDatabaseRequired.Error(),
+		},
+		{
+			in: models.DatabaseConfig{
+				Driver:   models.PostgresDriver,
+				Database: "some_name",
+			},
+			err: ErrUsernameRequired.Error(),
+		},
+		{
+			in: models.DatabaseConfig{
+				Driver:   models.PostgresDriver,
+				Username: "root",
+				Database: "someDB",
+			},
+			out: "postgres://root@localhost:5432/someDB",
+		},
+		{
+			in: models.DatabaseConfig{
+				Driver:   models.PostgresDriver,
+				Username: "root",
+				Password: "fp123",
+				Database: "someDB",
+			},
+			out: "postgres://root:fp123@localhost:5432/someDB",
+		},
+		{
+			in: models.DatabaseConfig{
+				Driver:   models.PostgresDriver,
+				Username: "root",
+				Password: "fp123",
+				Database: "someDB",
+				Host:     "fake-host",
+			},
+			out: "postgres://root:fp123@fake-host:5432/someDB",
+		},
+		{
+			in: models.DatabaseConfig{
+				Driver:   models.PostgresDriver,
+				Username: "root",
+				Password: "fp123",
+				Database: "someDB",
+				Host:     "fake-host",
+				Port:     "5433",
+			},
+			out: "postgres://root:fp123@fake-host:5433/someDB",
+		},
+		{
+			//Unix socket connection
+			in: models.DatabaseConfig{
+				Driver:   models.PostgresDriver,
+				Username: "root",
+				Password: "fp123",
+				Database: "someDB",
+				Host:     "/var/run/postgresql/.s.PGSQL.5432",
+				Protocol: "unix",
+			},
+			out: "postgres://root:fp123@/var/run/postgresql/.s.PGSQL.5432/someDB",
+		},
+		{
+			//IPv6 needs to be in square brackets
+			in: models.DatabaseConfig{
+				Driver:   models.PostgresDriver,
+				Username: "root",
+				Password: "fp123",
+				Database: "someDB",
+				Host:     "de:ad:be:ef::ca:fe",
+			},
+			out: "postgres://root:fp123@[de:ad:be:ef::ca:fe]:5432/someDB",
+		},
+		{
+			in: models.DatabaseConfig{
+				Driver:   models.PostgresDriver,
+				Username: "root",
+				Password: "fp123",
+				Database: "someDB",
+				Params: map[string]string{
+					"client_encoding": "utf8mb4",
+					"datestyle":       "ISO, MDY",
+				},
+			},
+			out: "postgres://root:fp123@localhost:5432/someDB?client_encoding=utf8mb4&datestyle=ISO, MDY",
+		},
+		{
+			// ca cert file path
+			in: models.DatabaseConfig{
+				Driver:   models.PostgresDriver,
+				Username: "root",
+				Password: "fp123",
+				Database: "someDB",
+				Host:     "fake-host",
+				TLSConfig: &models.TLSConfig{
+					CAFile: filepath.Join("models", "fixtures", "ca.cert.pem"),
+				},
+			},
+			out: fmt.Sprintf("postgres://root:fp123@fake-host:5432/someDB?sslrootcert=%s",
+				filepath.Join("models", "fixtures", "ca.cert.pem"),
+			),
+		},
+		{
+			// key and cert file path
+			in: models.DatabaseConfig{
+				Driver:   models.PostgresDriver,
+				Username: "root",
+				Password: "fp123",
+				Database: "someDB",
+				TLSConfig: &models.TLSConfig{
+					KeyFile:  filepath.Join("models", "fixtures", "test.key"),
+					CertFile: filepath.Join("models", "fixtures", "test.crt"),
+					SSLMode:  "verify-full",
+				},
+			},
+			out: fmt.Sprintf("postgres://root:fp123@localhost:5432/someDB?sslcert=%s&sslkey=%s&sslmode=%s",
+				filepath.Join("models", "fixtures", "test.crt"),
+				filepath.Join("models", "fixtures", "test.key"),
+				"verify-full",
+			),
 		},
 	}
 
