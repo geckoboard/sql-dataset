@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/geckoboard/sql-dataset/drivers"
 	"github.com/geckoboard/sql-dataset/models"
 )
 
@@ -35,9 +36,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	if config.DatabaseConfig.Driver == models.MysqlDriver {
-		ConfigureMySQLDSN(config)
+	// Build the connection string
+	dc := config.DatabaseConfig
+	s, err := drivers.NewDSNBuilder(dc.Driver).Build(dc)
+	if err != nil {
+		fmt.Println("Error occurred building connection string:", err)
+		os.Exit(1)
 	}
+
+	dc.URL = s
 
 	if config.RefreshTimeSec == 0 {
 		fmt.Println("No refresh timer specified will process once and exit\n")

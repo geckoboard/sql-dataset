@@ -41,8 +41,8 @@ type DatabaseConfig struct {
 
 type TLSConfig struct {
 	KeyFile  string `yaml:"key_file"`
-	CertFile string `yaml:"cert"`
-	CAFile   string `yaml:"ca_cert"`
+	CertFile string `yaml:"cert_file"`
+	CAFile   string `yaml:"ca_file"`
 	SSLMode  string `yaml:"ssl_mode"`
 }
 
