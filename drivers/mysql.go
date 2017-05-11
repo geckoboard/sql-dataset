@@ -76,7 +76,8 @@ func (m mysql) loadCerts(keyFile, certFile, caFile string) (*x509.CertPool, []tl
 		}
 	}
 
-	clientCert := make([]tls.Certificate, 0, 1)
+	var clientCert []tls.Certificate
+
 	if certFile != "" && keyFile != "" {
 		certs, err := tls.LoadX509KeyPair(certFile, keyFile)
 		if err != nil {

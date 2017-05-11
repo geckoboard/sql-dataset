@@ -49,7 +49,7 @@ func buildParams(buf *bytes.Buffer, str string) {
 }
 
 func orderKeys(kv map[string]string) []string {
-	keys := make([]string, 0, len(kv))
+	var keys []string
 
 	for k := range kv {
 		keys = append(keys, k)
