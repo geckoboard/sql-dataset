@@ -28,7 +28,6 @@ func TestValidate(t *testing.T) {
 			[]string{
 				"Geckoboard api key is required",
 				"Database driver is required",
-				"Database url is required",
 			},
 		},
 		{
@@ -58,7 +57,7 @@ func TestValidate(t *testing.T) {
 				GeckoboardAPIKey: "1234-12345",
 				RefreshTimeSec:   120,
 				DatabaseConfig: &DatabaseConfig{
-					Driver: MysqlDriver,
+					Driver: MySQLDriver,
 					URL:    "mysql://localhost/testdb",
 				},
 			},
@@ -69,7 +68,7 @@ func TestValidate(t *testing.T) {
 				GeckoboardAPIKey: "1234-12345",
 				RefreshTimeSec:   120,
 				DatabaseConfig: &DatabaseConfig{
-					Driver: MysqlDriver,
+					Driver: MySQLDriver,
 					URL:    "mysql://localhost/testdb",
 				},
 				Datasets: []Dataset{
@@ -129,8 +128,48 @@ func TestLoadConfig(t *testing.T) {
 			&Config{
 				GeckoboardAPIKey: "1234dsfd21322",
 				DatabaseConfig: &DatabaseConfig{
-					Driver: PostgresDriver,
-					URL:    "postgres://fake",
+					Driver:   PostgresDriver,
+					Username: "root",
+					Password: "pass234",
+					Host:     "/var/postgres/POSTGRES.5543",
+					Protocol: "unix",
+					Database: "someDB",
+					TLSConfig: &TLSConfig{
+						KeyFile:  "path/test.key",
+						CertFile: "path/test.crt",
+					},
+					Params: map[string]string{
+						"charset": "utf-8",
+					},
+				},
+				RefreshTimeSec: 60,
+				Datasets: []Dataset{
+					{
+						Name:       "active.users.by.org.plan",
+						UpdateType: Replace,
+						SQL:        "SELECT o.plan_type, count(*) user_count FROM users u, organisation o where o.user_id = u.id AND o.plan_type <> 'trial' order by user_count DESC limit 10",
+						Fields: []Field{
+							{Name: "count", Type: NumberType},
+							{Name: "org", Type: StringType},
+						},
+					},
+				},
+			},
+			"",
+		},
+		{
+			filepath.Join("fixtures", "valid_config2.yml"),
+			&Config{
+				GeckoboardAPIKey: "1234dsfd21322",
+				DatabaseConfig: &DatabaseConfig{
+					Driver:   PostgresDriver,
+					Host:     "fake-host",
+					Port:     "5433",
+					Database: "someDB",
+					TLSConfig: &TLSConfig{
+						CAFile:  "path/cert.pem",
+						SSLMode: "verify-full",
+					},
 				},
 				RefreshTimeSec: 60,
 				Datasets: []Dataset{
