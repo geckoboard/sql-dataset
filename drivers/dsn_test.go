@@ -43,20 +43,20 @@ func TestNewDSNBuilder(t *testing.T) {
 		//Mysql Driver
 		{
 			in: models.DatabaseConfig{
-				Driver: models.MysqlDriver,
+				Driver: models.MySQLDriver,
 			},
 			err: ErrDatabaseRequired.Error(),
 		},
 		{
 			in: models.DatabaseConfig{
-				Driver:   models.MysqlDriver,
+				Driver:   models.MySQLDriver,
 				Database: "some_name",
 			},
 			err: ErrUsernameRequired.Error(),
 		},
 		{
 			in: models.DatabaseConfig{
-				Driver:   models.MysqlDriver,
+				Driver:   models.MySQLDriver,
 				Username: "root",
 				Database: "someDB",
 			},
@@ -64,7 +64,7 @@ func TestNewDSNBuilder(t *testing.T) {
 		},
 		{
 			in: models.DatabaseConfig{
-				Driver:   models.MysqlDriver,
+				Driver:   models.MySQLDriver,
 				Username: "root",
 				Password: "fp123",
 				Database: "someDB",
@@ -73,7 +73,7 @@ func TestNewDSNBuilder(t *testing.T) {
 		},
 		{
 			in: models.DatabaseConfig{
-				Driver:   models.MysqlDriver,
+				Driver:   models.MySQLDriver,
 				Username: "root",
 				Password: "fp123",
 				Database: "someDB",
@@ -83,7 +83,7 @@ func TestNewDSNBuilder(t *testing.T) {
 		},
 		{
 			in: models.DatabaseConfig{
-				Driver:   models.MysqlDriver,
+				Driver:   models.MySQLDriver,
 				Username: "root",
 				Password: "fp123",
 				Database: "someDB",
@@ -95,7 +95,7 @@ func TestNewDSNBuilder(t *testing.T) {
 		{
 			//Unix socket connection
 			in: models.DatabaseConfig{
-				Driver:   models.MysqlDriver,
+				Driver:   models.MySQLDriver,
 				Username: "root",
 				Password: "fp123",
 				Database: "someDB",
@@ -107,7 +107,7 @@ func TestNewDSNBuilder(t *testing.T) {
 		{
 			//IPv6 needs to be in square brackets
 			in: models.DatabaseConfig{
-				Driver:   models.MysqlDriver,
+				Driver:   models.MySQLDriver,
 				Username: "root",
 				Password: "fp123",
 				Database: "someDB",
@@ -117,7 +117,7 @@ func TestNewDSNBuilder(t *testing.T) {
 		},
 		{
 			in: models.DatabaseConfig{
-				Driver:   models.MysqlDriver,
+				Driver:   models.MySQLDriver,
 				Username: "root",
 				Password: "fp123",
 				Database: "someDB",
@@ -128,7 +128,7 @@ func TestNewDSNBuilder(t *testing.T) {
 		},
 		{
 			in: models.DatabaseConfig{
-				Driver:   models.MysqlDriver,
+				Driver:   models.MySQLDriver,
 				Username: "root",
 				Password: "fp123",
 				Database: "someDB",
@@ -142,7 +142,7 @@ func TestNewDSNBuilder(t *testing.T) {
 		{
 			// ca cert file path
 			in: models.DatabaseConfig{
-				Driver:   models.MysqlDriver,
+				Driver:   models.MySQLDriver,
 				Username: "root",
 				Password: "fp123",
 				Database: "someDB",
@@ -155,7 +155,7 @@ func TestNewDSNBuilder(t *testing.T) {
 		{
 			// invalid ca cert file
 			in: models.DatabaseConfig{
-				Driver:   models.MysqlDriver,
+				Driver:   models.MySQLDriver,
 				Username: "root",
 				Password: "fp123",
 				Database: "someDB",
@@ -168,7 +168,7 @@ func TestNewDSNBuilder(t *testing.T) {
 		{
 			// ssl only
 			in: models.DatabaseConfig{
-				Driver:   models.MysqlDriver,
+				Driver:   models.MySQLDriver,
 				Username: "root",
 				Password: "fp123",
 				Database: "someDB",
@@ -181,7 +181,7 @@ func TestNewDSNBuilder(t *testing.T) {
 		{
 			// key and cert file path
 			in: models.DatabaseConfig{
-				Driver:   models.MysqlDriver,
+				Driver:   models.MySQLDriver,
 				Username: "root",
 				Password: "fp123",
 				Database: "someDB",

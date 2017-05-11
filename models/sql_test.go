@@ -827,7 +827,7 @@ func TestBuildDatasetPostgresDriver(t *testing.T) {
 	}
 }
 
-func TestBuildDatasetMysqlDriver(t *testing.T) {
+func TestBuildDatasetMySQLDriver(t *testing.T) {
 	// Setup the postgres and run the insert
 	env, ok := os.LookupEnv("MYSQL_URL")
 	if !ok {
@@ -861,7 +861,7 @@ func TestBuildDatasetMysqlDriver(t *testing.T) {
 				GeckoboardAPIKey: "1234-12345",
 				RefreshTimeSec:   120,
 				DatabaseConfig: &DatabaseConfig{
-					Driver: MysqlDriver,
+					Driver: MySQLDriver,
 					URL:    "root@tcp(fakehost:3306)/testdb",
 				},
 				Datasets: []Dataset{
@@ -882,7 +882,7 @@ func TestBuildDatasetMysqlDriver(t *testing.T) {
 		{
 			config: Config{
 				DatabaseConfig: &DatabaseConfig{
-					Driver: MysqlDriver,
+					Driver: MySQLDriver,
 					URL:    env,
 				},
 				Datasets: []Dataset{
@@ -901,7 +901,7 @@ func TestBuildDatasetMysqlDriver(t *testing.T) {
 		{
 			config: Config{
 				DatabaseConfig: &DatabaseConfig{
-					Driver: MysqlDriver,
+					Driver: MySQLDriver,
 					URL:    env,
 				},
 				Datasets: []Dataset{
@@ -920,7 +920,7 @@ func TestBuildDatasetMysqlDriver(t *testing.T) {
 		{
 			config: Config{
 				DatabaseConfig: &DatabaseConfig{
-					Driver: MysqlDriver,
+					Driver: MySQLDriver,
 					URL:    env,
 				},
 				Datasets: []Dataset{
@@ -940,7 +940,7 @@ func TestBuildDatasetMysqlDriver(t *testing.T) {
 			// StringType and Number as an int64
 			config: Config{
 				DatabaseConfig: &DatabaseConfig{
-					Driver: MysqlDriver,
+					Driver: MySQLDriver,
 					URL:    env,
 				},
 				Datasets: []Dataset{
@@ -981,7 +981,7 @@ func TestBuildDatasetMysqlDriver(t *testing.T) {
 			// Date only with money type grouping by date in sql
 			config: Config{
 				DatabaseConfig: &DatabaseConfig{
-					Driver: MysqlDriver,
+					Driver: MySQLDriver,
 					URL:    env,
 				},
 				Datasets: []Dataset{
@@ -1014,7 +1014,7 @@ func TestBuildDatasetMysqlDriver(t *testing.T) {
 			// Datetime type example
 			config: Config{
 				DatabaseConfig: &DatabaseConfig{
-					Driver: MysqlDriver,
+					Driver: MySQLDriver,
 					URL:    env,
 				},
 				Datasets: []Dataset{
@@ -1071,7 +1071,7 @@ func TestBuildDatasetMysqlDriver(t *testing.T) {
 			// PercentageType with stringType
 			config: Config{
 				DatabaseConfig: &DatabaseConfig{
-					Driver: MysqlDriver,
+					Driver: MySQLDriver,
 					URL:    env,
 				},
 				Datasets: []Dataset{
@@ -1128,7 +1128,7 @@ func TestBuildDatasetMysqlDriver(t *testing.T) {
 			// NumberType as float64 and date only type
 			config: Config{
 				DatabaseConfig: &DatabaseConfig{
-					Driver: MysqlDriver,
+					Driver: MySQLDriver,
 					URL:    env,
 				},
 				Datasets: []Dataset{
@@ -1184,7 +1184,7 @@ func TestBuildDatasetMysqlDriver(t *testing.T) {
 		{
 			config: Config{
 				DatabaseConfig: &DatabaseConfig{
-					Driver: MysqlDriver,
+					Driver: MySQLDriver,
 					URL:    env,
 				},
 				Datasets: []Dataset{

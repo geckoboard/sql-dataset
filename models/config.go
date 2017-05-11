@@ -9,12 +9,12 @@ import (
 )
 
 const (
-	MysqlDriver    = "mysql"
+	MySQLDriver    = "mysql"
 	PostgresDriver = "postgres"
 	SQLiteDriver   = "sqlite3"
 )
 
-var supportedDrivers = []string{MysqlDriver, PostgresDriver, SQLiteDriver}
+var supportedDrivers = []string{MySQLDriver, PostgresDriver, SQLiteDriver}
 var errParseConfigFile = "Error occurred parsing the config: %s"
 
 type Config struct {

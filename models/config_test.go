@@ -57,7 +57,7 @@ func TestValidate(t *testing.T) {
 				GeckoboardAPIKey: "1234-12345",
 				RefreshTimeSec:   120,
 				DatabaseConfig: &DatabaseConfig{
-					Driver: MysqlDriver,
+					Driver: MySQLDriver,
 					URL:    "mysql://localhost/testdb",
 				},
 			},
@@ -68,7 +68,7 @@ func TestValidate(t *testing.T) {
 				GeckoboardAPIKey: "1234-12345",
 				RefreshTimeSec:   120,
 				DatabaseConfig: &DatabaseConfig{
-					Driver: MysqlDriver,
+					Driver: MySQLDriver,
 					URL:    "mysql://localhost/testdb",
 				},
 				Datasets: []Dataset{

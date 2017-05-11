@@ -28,7 +28,7 @@ func NewDSNBuilder(driver string) DSNBuilder {
 	switch driver {
 	case models.PostgresDriver:
 		builder = postgres{}
-	case models.MysqlDriver:
+	case models.MySQLDriver:
 		builder = mysql{}
 	default:
 		builder = sqlite{}
