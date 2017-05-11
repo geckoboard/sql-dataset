@@ -38,7 +38,14 @@ func main() {
 
 	// Build the connection string
 	dc := config.DatabaseConfig
-	s, err := drivers.NewDSNBuilder(dc.Driver).Build(dc)
+	b, err := drivers.NewConnStringBuilder(dc.Driver)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	s, err := b.Build(dc)
+
 	if err != nil {
 		fmt.Println("Error occurred building connection string:", err)
 		os.Exit(1)

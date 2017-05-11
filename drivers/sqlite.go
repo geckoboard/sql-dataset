@@ -9,7 +9,7 @@ import (
 
 type sqlite struct{}
 
-func (s sqlite) Build(dc *models.DatabaseConfig) (dsn string, err error) {
+func (s sqlite) Build(dc *models.DatabaseConfig) (conn string, err error) {
 	var buf bytes.Buffer
 
 	if dc.Database == "" {
@@ -26,10 +26,10 @@ func (s sqlite) Build(dc *models.DatabaseConfig) (dsn string, err error) {
 	}
 
 	if buf.Len() > 0 {
-		dsn = fmt.Sprintf("file:%s?%s", dc.Database, buf.String())
+		conn = fmt.Sprintf("file:%s?%s", dc.Database, buf.String())
 	} else {
-		dsn = dc.Database
+		conn = dc.Database
 	}
 
-	return dsn, err
+	return conn, err
 }

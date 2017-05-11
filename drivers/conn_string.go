@@ -3,6 +3,7 @@ package drivers
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"sort"
 
 	"github.com/geckoboard/sql-dataset/models"
@@ -18,23 +19,21 @@ var (
 	ErrUsernameRequired = errors.New("Username is required for a connection")
 )
 
-type DSNBuilder interface {
+type ConnStringBuilder interface {
 	Build(*models.DatabaseConfig) (string, error)
 }
 
-func NewDSNBuilder(driver string) DSNBuilder {
-	var builder DSNBuilder
-
+func NewConnStringBuilder(driver string) (ConnStringBuilder, error) {
 	switch driver {
 	case models.PostgresDriver:
-		builder = postgres{}
+		return postgres{}, nil
 	case models.MySQLDriver:
-		builder = mysql{}
+		return mysql{}, nil
+	case models.SQLiteDriver:
+		return sqlite{}, nil
 	default:
-		builder = sqlite{}
+		return nil, fmt.Errorf("Unknown driver %s to build connection string", driver)
 	}
-
-	return builder
 }
 
 func buildParams(buf *bytes.Buffer, str string) {

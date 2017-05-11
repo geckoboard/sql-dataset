@@ -25,7 +25,7 @@ verify-ca - Always SSL (verify server cert trusted CA)
 verify-full - Same as verify-ca and server host on cert matches
 */
 
-func (p postgres) Build(dc *models.DatabaseConfig) (dsn string, err error) {
+func (p postgres) Build(dc *models.DatabaseConfig) (string, error) {
 	var buf bytes.Buffer
 
 	if dc.Database == "" {

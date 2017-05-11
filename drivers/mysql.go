@@ -29,7 +29,7 @@ const (
 	mysqlPort   = "3306"
 )
 
-func (m mysql) Build(dc *models.DatabaseConfig) (dsn string, err error) {
+func (m mysql) Build(dc *models.DatabaseConfig) (string, error) {
 	var buf bytes.Buffer
 
 	m.setDefaults(dc)

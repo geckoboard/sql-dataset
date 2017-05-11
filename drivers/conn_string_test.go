@@ -8,11 +8,12 @@ import (
 	"github.com/geckoboard/sql-dataset/models"
 )
 
-func TestNewDSNBuilder(t *testing.T) {
+func TestNewConnStringBuilder(t *testing.T) {
 	testCases := []struct {
-		in  models.DatabaseConfig
-		out string
-		err string
+		in          models.DatabaseConfig
+		out         string
+		err         string
+		isDriverErr bool
 	}{
 		//SQLite Driver
 		{
@@ -315,11 +316,36 @@ func TestNewDSNBuilder(t *testing.T) {
 				"verify-full",
 			),
 		},
+		// None existing driver
+		// This really should never happen because of config validation
+		{
+			in: models.DatabaseConfig{
+				Driver: "PearDB",
+			},
+			err:         "Unknown driver PearDB to build connection string",
+			isDriverErr: true,
+		},
 	}
 
 	for i, tc := range testCases {
-		n := NewDSNBuilder(tc.in.Driver)
-		dsn, err := n.Build(&tc.in)
+		n, err := NewConnStringBuilder(tc.in.Driver)
+		if err != nil {
+			if tc.isDriverErr {
+				if tc.err != err.Error() {
+					t.Errorf("Expected driver error %s but got %s", tc.err, err)
+				}
+			} else {
+				t.Error(err)
+			}
+
+			continue
+		}
+
+		if tc.isDriverErr && err == nil {
+			t.Errorf("Expected driver error %s but got none")
+		}
+
+		conn, err := n.Build(&tc.in)
 
 		if tc.err == "" && err != nil {
 			t.Errorf("[%d] Expected no error but got %s", i, err)
@@ -333,8 +359,8 @@ func TestNewDSNBuilder(t *testing.T) {
 			t.Errorf("[%d] Expected error %s but got %s", i, tc.err, err)
 		}
 
-		if dsn != tc.out {
-			t.Errorf("[%d] Expected dsn connection string '%s' but got '%s'", i, tc.out, dsn)
+		if conn != tc.out {
+			t.Errorf("[%d] Expected dsn connection string '%s' but got '%s'", i, tc.out, conn)
 		}
 	}
 }
