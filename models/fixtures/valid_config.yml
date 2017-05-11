@@ -1,12 +1,12 @@
 ---
 geckoboard_api_key: '1234dsfd21322'
-database_config:
+database:
  driver: postgres
  username: "root"
  password: "pass234"
  host: "/var/postgres/POSTGRES.5543"
  protocol: "unix"
- database: "someDB"
+ name: "someDB"
  tls_config:
    key_file: "path/test.key"
    cert_file: "path/test.crt"

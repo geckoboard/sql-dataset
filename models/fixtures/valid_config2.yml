@@ -1,10 +1,10 @@
 ---
 geckoboard_api_key: '1234dsfd21322'
-database_config:
+database:
  driver: postgres
  host: "fake-host"
  port: "5433"
- database: "someDB"
+ name: "someDB"
  tls_config:
    ca_file: "path/cert.pem"
    ssl_mode: "verify-full"

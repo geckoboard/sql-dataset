@@ -19,7 +19,7 @@ var errParseConfigFile = "Error occurred parsing the config: %s"
 
 type Config struct {
 	GeckoboardAPIKey string          `yaml:"geckoboard_api_key"`
-	DatabaseConfig   *DatabaseConfig `yaml:"database_config"`
+	DatabaseConfig   *DatabaseConfig `yaml:"database"`
 	RefreshTimeSec   uint16          `yaml:"refresh_time_sec"`
 	Datasets         []Dataset       `yaml:"datasets"`
 }
@@ -32,7 +32,7 @@ type DatabaseConfig struct {
 	Host      string            `yaml:"host"`
 	Port      string            `yaml:"port"`
 	Protocol  string            `yaml:"protocol"`
-	Database  string            `yaml:"database"`
+	Database  string            `yaml:"name"`
 	Username  string            `yaml:"username"`
 	Password  string            `yaml:"password"`
 	TLSConfig *TLSConfig        `yaml:"tls_config"`
