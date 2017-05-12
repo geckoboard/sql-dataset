@@ -41,7 +41,7 @@ type Field struct {
 	Type         FieldType `yaml:"type"`
 	Key          string    `yaml:"key"`
 	Name         string    `yaml:"name"`
-	CurrencyCode string    `yaml:currency_code`
+	CurrencyCode string    `yaml:"currency_code"`
 }
 
 // KeyValue returns the field key if present

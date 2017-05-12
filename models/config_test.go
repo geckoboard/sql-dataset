@@ -150,7 +150,7 @@ func TestLoadConfig(t *testing.T) {
 						SQL:        "SELECT o.plan_type, count(*) user_count FROM users u, organisation o where o.user_id = u.id AND o.plan_type <> 'trial' order by user_count DESC limit 10",
 						Fields: []Field{
 							{Name: "count", Type: NumberType},
-							{Name: "org", Type: StringType},
+							{Name: "org", Type: StringType, Key: "custom_org"},
 						},
 					},
 				},
@@ -180,6 +180,7 @@ func TestLoadConfig(t *testing.T) {
 						Fields: []Field{
 							{Name: "count", Type: NumberType},
 							{Name: "org", Type: StringType},
+							{Name: "Total Earnings", Type: MoneyType, CurrencyCode: "USD"},
 						},
 					},
 				},
@@ -203,5 +204,32 @@ func TestLoadConfig(t *testing.T) {
 		if err != nil && tc.err != err.Error() {
 			t.Errorf("[%d] Expected error %s but got %s", i, tc.err, err.Error())
 		}
+	}
+}
+
+func TestFieldKeyValue(t *testing.T) {
+	ds := Dataset{
+		Fields: []Field{
+			{
+				Key:  "customKey",
+				Name: "Percent Complete",
+				Type: PercentageType,
+			},
+			{
+				Name: "Total Cost",
+				Type: MoneyType,
+			},
+		},
+	}
+
+	customKey := "customKey"
+	normalKey := "total_cost"
+
+	if key := ds.Fields[0].KeyValue(); key != customKey {
+		t.Errorf("Expected keyvalue '%s' but got '%s'", customKey, key)
+	}
+
+	if key := ds.Fields[1].KeyValue(); key != normalKey {
+		t.Errorf("Expected keyvalue '%s' but got '%s'", normalKey, key)
 	}
 }

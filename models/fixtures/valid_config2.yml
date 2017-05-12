@@ -14,7 +14,10 @@ datasets:
    update_type: replace
    sql: SELECT o.plan_type, count(*) user_count FROM users u, organisation o where o.user_id = u.id AND o.plan_type <> 'trial' order by user_count DESC limit 10
    fields:
-     - type: 'number'
-       name: "count"
-     - type: 'string'
-       name: "org"
+     - type: number
+       name: count
+     - type: string
+       name: org
+     - type: money
+       name: Total Earnings
+       currency_code: USD
