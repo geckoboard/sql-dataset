@@ -11,7 +11,12 @@ import (
 	"github.com/geckoboard/sql-dataset/models"
 )
 
-var configFile = flag.String("config", "sql-dataset.yml", "Config file to load")
+const errMsg = "Dataset '%s' errored: %s\n"
+
+var (
+	configFile = flag.String("config", "sql-dataset.yml", "Config file to load")
+	client     *Client
+)
 
 func main() {
 	flag.Parse()
@@ -52,6 +57,7 @@ func main() {
 	}
 
 	dc.URL = s
+	client = NewClient(config.GeckoboardAPIKey)
 
 	if config.RefreshTimeSec == 0 {
 		fmt.Println("No refresh timer specified will process once and exit\n")
@@ -66,17 +72,25 @@ func main() {
 }
 
 func processAllDatasets(config *models.Config) (hasErrored bool) {
+
 	for _, ds := range config.Datasets {
 		datasetRecs, err := ds.BuildDataset(config.DatabaseConfig)
 		if err != nil {
-			fmt.Printf("Dataset '%s' errored: %s\n", ds.Name, err)
+			fmt.Printf(errMsg, ds.Name, err)
 			hasErrored = true
 			continue
 		}
 
-		err = PushData(ds, datasetRecs, config.GeckoboardAPIKey)
+		err = client.FindOrCreateDataset(&ds)
 		if err != nil {
-			fmt.Printf("Dataset '%s' errored: %s\n", ds.Name, err)
+			fmt.Println(errMsg, ds.Name, err)
+			hasErrored = true
+			continue
+		}
+
+		err = client.SendAllData(&ds, datasetRecs)
+		if err != nil {
+			fmt.Printf(errMsg, ds.Name, err)
 			hasErrored = true
 			continue
 		}

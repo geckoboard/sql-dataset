@@ -1,80 +1,141 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
 	"fmt"
+	"net/http"
+	"time"
 
-	gb "github.com/geckoboard/geckoboard-go"
 	"github.com/geckoboard/sql-dataset/models"
 )
 
+type Client struct {
+	apiKey string
+	client *http.Client
+}
+
+type Error struct {
+	Detail `json:"error"`
+}
+
+type Detail struct {
+	Message string `json:"message"`
+}
+
+type DataPayload struct {
+	Data models.DatasetRows `json:"data"`
+}
+
 var (
-	gbClient  *gb.Client
+	gbHost    = "https://api.geckoboard.com"
 	batchRows = 500
 
-	errMoreRowsToSend = "Sent only the first %d rows, %d rows existed " +
+	errUnexpectedResponse = errors.New("Unexpected server error response from Geckoboard")
+	errMoreRowsToSend     = "Sent the first %d rows, %d rows existed " +
 		"to support sending more change dataset update type " +
 		"from 'replace' to 'append' to support upto 5000 rows"
 )
 
-func PushData(ds models.Dataset, rows models.DatasetRows, key string) (err error) {
-	if gbClient == nil {
-		gbClient = gb.New(gb.Config{Key: key})
+func NewClient(apiKey string) *Client {
+	return &Client{
+		apiKey: apiKey,
+		client: &http.Client{Timeout: time.Second * 10},
 	}
+}
 
-	// Create & push dataset schema
-	dataset := gb.DataSet{
-		ID:       ds.Name,
-		UniqueBy: ds.UniqueBy,
-		Fields:   remapFields(ds),
-	}
+func (c Client) FindOrCreateDataset(ds *models.Dataset) error {
+	ds.BuildGBFields()
+	resp, err := c.makeRequest(http.MethodPut, fmt.Sprintf("/datasets/%s", ds.Name), ds)
 
-	err = dataset.FindOrCreate(gbClient)
 	if err != nil {
 		return err
 	}
 
-	return batchRequests(ds.UpdateType, dataset, rows)
+	defer resp.Body.Close()
+	return handleResponse(resp)
 }
 
-func remapFields(ds models.Dataset) (fields gb.Fields) {
-	fields = make(gb.Fields)
+func (c Client) sendData(ds *models.Dataset, data models.DatasetRows) (err error) {
+	method := http.MethodPost
 
-	for _, f := range ds.Fields {
-		fields[f.KeyValue()] = gb.Field{
-			Name:         f.Name,
-			Type:         string(f.Type),
-			CurrencyCode: f.CurrencyCode,
-		}
+	if ds.UpdateType == models.Replace {
+		method = http.MethodPut
 	}
 
-	return fields
+	resp, err := c.makeRequest(method, fmt.Sprintf("/datasets/%s/data", ds.Name), DataPayload{data})
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+	return handleResponse(resp)
 }
 
-func batchRequests(updateType models.DatasetType, dataset gb.DataSet, rows models.DatasetRows) (err error) {
-	switch updateType {
+// SendAllData determines how to send the data to Geckoboard and returns an error
+// if there is too much data for replace dataset and batches requests for append
+func (c Client) SendAllData(ds *models.Dataset, data models.DatasetRows) (err error) {
+	switch ds.UpdateType {
 	case models.Replace:
-		if len(rows) > batchRows {
-			err = dataset.SendAll(gbClient, rows[0:batchRows])
+		if len(data) > batchRows {
+			err = c.sendData(ds, data[0:batchRows])
 			if err == nil {
-				// Error that there were more rows to send
-				err = fmt.Errorf(errMoreRowsToSend, batchRows, len(rows))
+				err = fmt.Errorf(errMoreRowsToSend, batchRows, len(data))
 			}
 		} else {
-			err = dataset.SendAll(gbClient, rows[:len(rows)])
+			err = c.sendData(ds, data)
 		}
 	case models.Append:
-		grps := len(rows) / batchRows
+		grps := len(data) / batchRows
 
 		for i := 0; i <= grps; i++ {
 			if i == grps {
-				if (batchRows*i)+1 <= len(rows) {
-					err = dataset.Append(gbClient, rows[batchRows*i:])
+				if (batchRows*i)+1 <= len(data) {
+					err = c.sendData(ds, data[batchRows*i:])
 				}
 			} else {
-				err = dataset.Append(gbClient, rows[batchRows*i:batchRows*(i+1)])
+				err = c.sendData(ds, data[batchRows*i:batchRows*(i+1)])
+			}
+
+			if err != nil {
+				return err
 			}
 		}
 	}
 
 	return err
+}
+
+func (c Client) makeRequest(method, path string, body interface{}) (resp *http.Response, err error) {
+	var b []byte
+
+	if body != nil {
+		if b, err = json.Marshal(body); err != nil {
+			return nil, err
+		}
+	}
+
+	req, err := http.NewRequest(method, fmt.Sprintf("%s%s", gbHost, path), bytes.NewReader(b))
+
+	if err != nil {
+		return nil, err
+	}
+
+	req.SetBasicAuth(c.apiKey, "")
+
+	return c.client.Do(req)
+}
+
+func handleResponse(resp *http.Response) error {
+	switch res := resp.StatusCode; true {
+	case res >= 200 && res < 300:
+		return nil
+	case res >= 400 && res < 500:
+		var err Error
+		json.NewDecoder(resp.Body).Decode(&err)
+		return fmt.Errorf("response error: %s", err.Detail.Message)
+	default:
+		return errUnexpectedResponse
+	}
 }

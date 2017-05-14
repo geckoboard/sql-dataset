@@ -9,7 +9,6 @@ import (
 	"strings"
 	"testing"
 
-	gb "github.com/geckoboard/geckoboard-go"
 	"github.com/geckoboard/sql-dataset/models"
 )
 
@@ -58,7 +57,7 @@ func TestEndToEndFlow(t *testing.T) {
 			gbReqs: []GBRequest{
 				{
 					Path: "/datasets/app.counts",
-					Body: `{"id":"app.counts","fields":{"app":{"name":"App","type":"string","currency_code":""},"build_count":{"name":"Build Count","type":"number","currency_code":""}},"unique_by":null,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`,
+					Body: `{"id":"app.counts","fields":{"app":{"type":"string","name":"App"},"build_count":{"type":"number","name":"Build Count"}}}`,
 				},
 				{
 					Path: "/datasets/app.counts/data",
@@ -66,7 +65,7 @@ func TestEndToEndFlow(t *testing.T) {
 				},
 				{
 					Path: "/datasets/app.build.costs",
-					Body: `{"id":"app.build.costs","fields":{"app":{"name":"App","type":"string","currency_code":""},"build_cost":{"name":"Build Cost","type":"money","currency_code":"USD"}},"unique_by":null,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`,
+					Body: `{"id":"app.build.costs","fields":{"app":{"type":"string","name":"App"},"build_cost":{"type":"money","name":"Build Cost","currency_code":"USD"}}}`,
 				},
 				{
 					Path: "/datasets/app.build.costs/data",
@@ -98,7 +97,7 @@ func TestEndToEndFlow(t *testing.T) {
 			gbReqs: []GBRequest{
 				{
 					Path: "/datasets/apps.run.time",
-					Body: `{"id":"apps.run.time","fields":{"app":{"name":"App","type":"string","currency_code":""},"run_time":{"name":"Run time","type":"number","currency_code":""}},"unique_by":null,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`,
+					Body: `{"id":"apps.run.time","fields":{"app":{"type":"string","name":"App"},"run_time":{"type":"number","name":"Run time"}}}`,
 				},
 				{
 					Path: "/datasets/apps.run.time/data",
@@ -129,7 +128,7 @@ func TestEndToEndFlow(t *testing.T) {
 			gbReqs: []GBRequest{
 				{
 					Path: "/datasets/apps.run.time",
-					Body: `{"id":"apps.run.time","fields":{"app":{"name":"App","type":"string","currency_code":""},"run_time":{"name":"Run time","type":"number","currency_code":""}},"unique_by":null,"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`,
+					Body: `{"id":"apps.run.time","fields":{"app":{"type":"string","name":"App"},"run_time":{"type":"number","name":"Run time"}}}`,
 				},
 				{
 					Path: "/datasets/apps.run.time/data",
@@ -168,7 +167,7 @@ func TestEndToEndFlow(t *testing.T) {
 			gbReqs: []GBRequest{
 				{
 					Path: "/datasets/app.counts",
-					Body: `{"id":"app.counts","fields":{"app":{"name":"App","type":"string","currency_code":""},"build_count":{"name":"Build Count","type":"number","currency_code":""}},"unique_by":["app_name"],"created_at":"0001-01-01T00:00:00Z","updated_at":"0001-01-01T00:00:00Z"}`,
+					Body: `{"id":"app.counts","unique_by":["app_name"],"fields":{"app":{"type":"string","name":"App"},"build_count":{"type":"number","name":"Build Count"}}}`,
 				},
 				{
 					Path: "/datasets/app.counts/data",
@@ -211,7 +210,8 @@ func TestEndToEndFlow(t *testing.T) {
 			fmt.Fprintf(w, `{}`)
 		}))
 
-		gbClient = gb.New(gb.Config{Key: "fakeKey", URL: gbWS.URL})
+		client = NewClient("fakeKey")
+		gbHost = gbWS.URL
 
 		bol := processAllDatasets(&tc.config)
 
