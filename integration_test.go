@@ -175,6 +175,36 @@ func TestEndToEndFlow(t *testing.T) {
 				},
 			},
 		},
+		{
+			// Optional field correctly sent as null
+			config: models.Config{
+				DatabaseConfig: &models.DatabaseConfig{
+					Driver: models.SQLiteDriver,
+					URL:    filepath.Join("models", "fixtures", "db.sqlite"),
+				},
+				Datasets: []models.Dataset{
+					{
+						Name:       "app.counts",
+						SQL:        `SELECT "test", null FROM builds limit 1`,
+						UpdateType: models.Append,
+						Fields: []models.Field{
+							{Name: "App", Type: models.StringType},
+							{Name: "Build Count", Type: models.NumberType, Optional: true},
+						},
+					},
+				},
+			},
+			gbReqs: []GBRequest{
+				{
+					Path: "/datasets/app.counts",
+					Body: `{"id":"app.counts","fields":{"app":{"type":"string","name":"App"},"build_count":{"type":"number","name":"Build Count","optional":true}}}`,
+				},
+				{
+					Path: "/datasets/app.counts/data",
+					Body: `{"data":[{"app":"test","build_count":null}]}`,
+				},
+			},
+		},
 	}
 
 	for i, tc := range testCases {

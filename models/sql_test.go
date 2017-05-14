@@ -391,6 +391,30 @@ func TestBuildDatasetSQLiteDriver(t *testing.T) {
 			},
 			err: "",
 		},
+		{
+			//NumberType as optional and is null returns null
+			config: Config{
+				DatabaseConfig: &DatabaseConfig{
+					Driver: SQLiteDriver,
+					URL:    "fixtures/db.sqlite",
+				},
+				Datasets: []Dataset{
+					{
+						SQL: `SELECT "test", null FROM builds limit 1`,
+						Fields: []Field{
+							{Name: "App", Type: StringType},
+							{Name: "Run time", Type: NumberType, Optional: true},
+						},
+					},
+				},
+			},
+			out: []map[string]interface{}{
+				{
+					"app":      "test",
+					"run_time": nil,
+				},
+			},
+		},
 	}
 
 	for idx, tc := range testCases {
@@ -799,6 +823,30 @@ func TestBuildDatasetPostgresDriver(t *testing.T) {
 			},
 			err: "",
 		},
+		{
+			//NumberType as optional and is null returns null
+			config: Config{
+				DatabaseConfig: &DatabaseConfig{
+					Driver: SQLiteDriver,
+					URL:    "fixtures/db.sqlite",
+				},
+				Datasets: []Dataset{
+					{
+						SQL: `SELECT "test", null FROM builds limit 1`,
+						Fields: []Field{
+							{Name: "App", Type: StringType},
+							{Name: "Run time", Type: NumberType, Optional: true},
+						},
+					},
+				},
+			},
+			out: []map[string]interface{}{
+				{
+					"app":      "test",
+					"run_time": nil,
+				},
+			},
+		},
 	}
 
 	for idx, tc := range testCases {
@@ -1206,6 +1254,30 @@ func TestBuildDatasetMySQLDriver(t *testing.T) {
 				},
 			},
 			err: "",
+		},
+		{
+			//NumberType as optional and is null returns null
+			config: Config{
+				DatabaseConfig: &DatabaseConfig{
+					Driver: SQLiteDriver,
+					URL:    "fixtures/db.sqlite",
+				},
+				Datasets: []Dataset{
+					{
+						SQL: `SELECT "test", null FROM builds limit 1`,
+						Fields: []Field{
+							{Name: "App", Type: StringType},
+							{Name: "Run time", Type: NumberType, Optional: true},
+						},
+					},
+				},
+			},
+			out: []map[string]interface{}{
+				{
+					"app":      "test",
+					"run_time": nil,
+				},
+			},
 		},
 	}
 
