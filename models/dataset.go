@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 )
 
@@ -20,6 +21,10 @@ const (
 	StringType     FieldType = "string"
 )
 
+var (
+	datasetNameRegexp = regexp.MustCompile(`(?)^[0-9a-z][0-9a-z._\-]{1,}[0-9a-z]$`)
+)
+
 var fieldTypes = []FieldType{
 	NumberType,
 	DateType,
@@ -30,12 +35,12 @@ var fieldTypes = []FieldType{
 }
 
 type Dataset struct {
-	Name       string      `json:"id"                   yaml:"name"`
-	UpdateType DatasetType `json:"-"                    yaml:"update_type"`
-	UniqueBy   []string    `json:"unique_by,omitempty"  yaml:"unique_by,omitempty"`
-	SQL        string      `json:"-"                    yaml:"sql"`
-	Fields     []Field     `json:"-"                    yaml:"fields"`
-	GBFields   *GBFields   `json:"fields"               yaml:"-"`
+	Name         string           `json:"id"                   yaml:"name"`
+	UpdateType   DatasetType      `json:"-"                    yaml:"update_type"`
+	UniqueBy     []string         `json:"unique_by,omitempty"  yaml:"unique_by,omitempty"`
+	SQL          string           `json:"-"                    yaml:"sql"`
+	Fields       []Field          `json:"-"                    yaml:"fields"`
+	SchemaFields map[string]Field `json:"fields"               yaml:"-"`
 }
 
 type Field struct {
@@ -45,8 +50,6 @@ type Field struct {
 	CurrencyCode string    `json:"currency_code,omitempty"  yaml:"currency_code"`
 	Optional     bool      `json:"optional,omitempty"       yaml:"optional,omitempty"`
 }
-
-type GBFields map[string]Field
 
 // KeyValue returns the field key if present
 // otherwise by default returns the field name underscored
@@ -58,25 +61,29 @@ func (f Field) KeyValue() string {
 	return strings.ToLower(strings.Replace(f.Name, " ", "_", -1))
 }
 
-// BuildGBFields creates a map[string]Field of
+// BuildSchemaFields creates a map[string]Field of
 // the dataset fields for sending over to Geckoboard
-func (ds *Dataset) BuildGBFields() {
-	if ds.GBFields != nil {
+func (ds *Dataset) BuildSchemaFields() {
+	if ds.SchemaFields != nil {
 		return
 	}
 
-	fields := make(GBFields)
+	fields := make(map[string]Field)
 
 	for _, f := range ds.Fields {
 		fields[f.KeyValue()] = f
 	}
 
-	ds.GBFields = &fields
+	ds.SchemaFields = fields
 }
 
 func (ds Dataset) Validate() (errors []string) {
 	if ds.Name == "" {
 		errors = append(errors, "Dataset name is required")
+	}
+
+	if ds.Name != "" && !datasetNameRegexp.MatchString(ds.Name) {
+		errors = append(errors, "Dataset name is invalid, should be 3 or more characters with only lowercase alphanumeric characters, dots, hyphens, and underscores")
 	}
 
 	if ds.UpdateType != Append && ds.UpdateType != Replace {

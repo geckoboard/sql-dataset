@@ -231,12 +231,12 @@ func TestFindOrCreateDataset(t *testing.T) {
 // Preset the dataset rows and test we batch correctly return errors on status codes
 func TestSendAllData(t *testing.T) {
 	testCases := []struct {
-		dataset   models.Dataset
-		data      models.DatasetRows
-		requests  []request
-		batchRows int
-		response  *response
-		err       string
+		dataset  models.Dataset
+		data     models.DatasetRows
+		requests []request
+		maxRows  int
+		response *response
+		err      string
 	}{
 		{
 			// Error with 40x
@@ -383,8 +383,8 @@ func TestSendAllData(t *testing.T) {
 					Body:   `{"data":[{"app":"acceptance","cost":4421},{"app":"redis","cost":221},{"app":"api","cost":212}]}`,
 				},
 			},
-			batchRows: 3,
-			err:       fmt.Sprintf(errMoreRowsToSend, 3, 4),
+			maxRows: 3,
+			err:     fmt.Sprintf(errMoreRowsToSend, 3, 4),
 		},
 		{
 			//Append dataset sends all data in batches
@@ -434,7 +434,7 @@ func TestSendAllData(t *testing.T) {
 					Body:   `{"data":[{"animal":"geese","run_time":44},{"animal":"terrapin","run_time":444},{"animal":"bird","run_time":22}]}`,
 				},
 			},
-			batchRows: 3,
+			maxRows: 3,
 		},
 		{
 			//Append dataset sends all data in batches remaining one
@@ -493,17 +493,17 @@ func TestSendAllData(t *testing.T) {
 					Body:   `{"data":[{"animal":"squirrel","run_time":88}]}`,
 				},
 			},
-			batchRows: 3,
+			maxRows: 3,
 		},
 	}
 
 	for _, tc := range testCases {
 		reqCount := 0
 
-		if tc.batchRows != 0 {
-			batchRows = tc.batchRows
+		if tc.maxRows != 0 {
+			maxRows = tc.maxRows
 		} else {
-			batchRows = 500
+			maxRows = 500
 		}
 
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

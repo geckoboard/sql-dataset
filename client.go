@@ -29,13 +29,13 @@ type DataPayload struct {
 }
 
 var (
-	gbHost    = "https://api.geckoboard.com"
-	batchRows = 500
+	gbHost  = "https://api.geckoboard.com"
+	maxRows = 500
 
 	errUnexpectedResponse = errors.New("Unexpected server error response from Geckoboard")
-	errMoreRowsToSend     = "Sent the first %d rows, %d rows existed " +
-		"to support sending more change dataset update type " +
-		"from 'replace' to 'append' to support upto 5000 rows"
+	errMoreRowsToSend     = "You're trying to send %d records, but we " +
+		"were only able to send the first %d. To send more, please " +
+		"change your dataset's update_type to 'append'"
 )
 
 func NewClient(apiKey string) *Client {
@@ -45,8 +45,8 @@ func NewClient(apiKey string) *Client {
 	}
 }
 
-func (c Client) FindOrCreateDataset(ds *models.Dataset) error {
-	ds.BuildGBFields()
+func (c *Client) FindOrCreateDataset(ds *models.Dataset) error {
+	ds.BuildSchemaFields()
 	resp, err := c.makeRequest(http.MethodPut, fmt.Sprintf("/datasets/%s", ds.Name), ds)
 
 	if err != nil {
@@ -57,7 +57,7 @@ func (c Client) FindOrCreateDataset(ds *models.Dataset) error {
 	return handleResponse(resp)
 }
 
-func (c Client) sendData(ds *models.Dataset, data models.DatasetRows) (err error) {
+func (c *Client) sendData(ds *models.Dataset, data models.DatasetRows) (err error) {
 	method := http.MethodPost
 
 	if ds.UpdateType == models.Replace {
@@ -75,27 +75,29 @@ func (c Client) sendData(ds *models.Dataset, data models.DatasetRows) (err error
 
 // SendAllData determines how to send the data to Geckoboard and returns an error
 // if there is too much data for replace dataset and batches requests for append
-func (c Client) SendAllData(ds *models.Dataset, data models.DatasetRows) (err error) {
+func (c *Client) SendAllData(ds *models.Dataset, data models.DatasetRows) (err error) {
 	switch ds.UpdateType {
 	case models.Replace:
-		if len(data) > batchRows {
-			err = c.sendData(ds, data[0:batchRows])
+		if len(data) > maxRows {
+			err = c.sendData(ds, data[0:maxRows])
 			if err == nil {
-				err = fmt.Errorf(errMoreRowsToSend, batchRows, len(data))
+				err = fmt.Errorf(errMoreRowsToSend, len(data), maxRows)
 			}
 		} else {
 			err = c.sendData(ds, data)
 		}
 	case models.Append:
-		grps := len(data) / batchRows
+		grps := len(data) / maxRows
 
 		for i := 0; i <= grps; i++ {
+			batch := maxRows * i
+
 			if i == grps {
-				if (batchRows*i)+1 <= len(data) {
-					err = c.sendData(ds, data[batchRows*i:])
+				if batch+1 <= len(data) {
+					err = c.sendData(ds, data[batch:])
 				}
 			} else {
-				err = c.sendData(ds, data[batchRows*i:batchRows*(i+1)])
+				err = c.sendData(ds, data[batch:maxRows*(i+1)])
 			}
 
 			if err != nil {
@@ -107,28 +109,29 @@ func (c Client) SendAllData(ds *models.Dataset, data models.DatasetRows) (err er
 	return err
 }
 
-func (c Client) makeRequest(method, path string, body interface{}) (resp *http.Response, err error) {
-	var b []byte
+func (c *Client) makeRequest(method, path string, body interface{}) (resp *http.Response, err error) {
+	var buf bytes.Buffer
 
 	if body != nil {
-		if b, err = json.Marshal(body); err != nil {
+		if err := json.NewEncoder(&buf).Encode(body); err != nil {
 			return nil, err
 		}
 	}
 
-	req, err := http.NewRequest(method, fmt.Sprintf("%s%s", gbHost, path), bytes.NewReader(b))
-
+	url := gbHost + path
+	req, err := http.NewRequest(method, url, &buf)
 	if err != nil {
 		return nil, err
 	}
 
 	req.SetBasicAuth(c.apiKey, "")
-
 	return c.client.Do(req)
 }
 
 func handleResponse(resp *http.Response) error {
-	switch res := resp.StatusCode; true {
+	res := resp.StatusCode
+
+	switch {
 	case res >= 200 && res < 300:
 		return nil
 	case res >= 400 && res < 500:

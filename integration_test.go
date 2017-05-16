@@ -22,7 +22,7 @@ type GBRequest struct {
 func TestEndToEndFlow(t *testing.T) {
 	testCases := []struct {
 		config      models.Config
-		batchRows   int
+		maxRows     int
 		expectError bool
 		gbHits      int
 		gbReqs      []GBRequest
@@ -92,7 +92,7 @@ func TestEndToEndFlow(t *testing.T) {
 					},
 				},
 			},
-			batchRows:   4,
+			maxRows:     4,
 			expectError: true,
 			gbReqs: []GBRequest{
 				{
@@ -124,7 +124,7 @@ func TestEndToEndFlow(t *testing.T) {
 					},
 				},
 			},
-			batchRows: 4,
+			maxRows: 4,
 			gbReqs: []GBRequest{
 				{
 					Path: "/datasets/apps.run.time",
@@ -208,10 +208,10 @@ func TestEndToEndFlow(t *testing.T) {
 	}
 
 	for i, tc := range testCases {
-		batchRows = originalBatchRows
+		maxRows = originalBatchRows
 
-		if tc.batchRows != 0 {
-			batchRows = tc.batchRows
+		if tc.maxRows != 0 {
+			maxRows = tc.maxRows
 		}
 
 		gbWS := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -240,10 +240,10 @@ func TestEndToEndFlow(t *testing.T) {
 			fmt.Fprintf(w, `{}`)
 		}))
 
-		client = NewClient("fakeKey")
+		client := NewClient("fakeKey")
 		gbHost = gbWS.URL
 
-		bol := processAllDatasets(&tc.config)
+		bol := processAllDatasets(&tc.config, client)
 
 		if tc.expectError != bol {
 			t.Errorf("[%d] Expected hasErrors to be %t but got %t", i, tc.expectError, bol)

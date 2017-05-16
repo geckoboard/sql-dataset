@@ -342,7 +342,7 @@ func TestNewConnStringBuilder(t *testing.T) {
 		}
 
 		if tc.isDriverErr && err == nil {
-			t.Errorf("Expected driver error %s but got none")
+			t.Errorf("Expected driver error %s but got none", tc.err)
 		}
 
 		conn, err := n.Build(&tc.in)
