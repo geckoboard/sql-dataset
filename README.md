@@ -6,7 +6,7 @@ SQL-Dataset is a command line app that takes the hassle out of integrating your 
 
 SQL-Dataset is available for macOS, Linux, and Windows. 
 
-## How to use SQL-Dataset
+## Quickstart
 
 ### 1. Download the app
 
@@ -18,11 +18,23 @@ SQL-Dataset is available for macOS, Linux, and Windows.
 
 SQL-Datasets works by reading all of the information it needs from a YAML file. We've prepared an [example one](docs/example.yml) for you so you can get started quickly. The fields are fairly self-explanatory, but you can learn more about them below.
 
-#### geckoboard_api_key
+### 3. Run the script
+
+Make sure that the SQL-Dataset app and your config file are in the same folder, then from the command line navigate to that folder and run
+
+```
+./sql-dataset -config config.yml
+```
+
+Where `config.yml` is the name of your config file. Once you see confirmation that everything ran successfully, head over to Geckoboard and [start using your new Dataset to build widgets](https://support.geckoboard.com/hc/en-us/articles/223190488-Guide-to-using-datasets)!
+
+## Building your config file
+
+### geckoboard_api_key
 
 Hopefully this is obvious, but this is where your Geckoboard API key goes. You can find yours [here](https://app.geckoboard.com/account/details).
 
-#### database
+### database
 
 Enter the type of database you're connecting to in the `driver` field. SQL-Dataset supports:
 
@@ -40,7 +52,7 @@ Only three parameters are required:
 
 The other attributes, such as `host` and `port`, will default to their driver-specific values unless overridden.
 
-##### SSL
+#### SSL
 
 If your database requires a CA cert or a x509 key/cert pair, you can supply this in `tls_config` under the database key.
 
@@ -58,17 +70,17 @@ The possible values for `ssl_mode` depend on the database you're using:
 - Postgres: `disable`, `require`, `verify-ca`, `verify-full`
 - SQLite: N/A
 
-##### A note on user permissions
+#### A note on user permissions
 
 We _strongly_ recommend that the user account you use with SQL-Dataset has the lowest level of permission necessary. For example, one which is only permitted to perform `SELECT` statements on the tables you're going to be using. Like any SQL program, SQL-Dataset will run any query you give it, which includes destructive operations such as overwriting existing data, removing records, and dropping tables. We accept no responsibility for any adverse changes to your database due to accidentally running such a query.
 
-#### refresh_time_sec
+### refresh_time_sec
 
 Once started, SQL-Dataset can run your queries periodically and push the results to Geckoboard. Use this field to specify the time, in seconds, between refreshes.
 
 If you do not wish for SQL-Dataset to run on a schedule, omit this option from your config.
 
-#### datasets
+### datasets
 
 Here's where the magic happens - specify the SQL queries you want to run, and the Datasets you want to push their results into.
 
@@ -78,9 +90,9 @@ Here's where the magic happens - specify the SQL queries you want to run, and th
  - `update_type`: Either `replace`, which overwrites the contents of the Dataset with new data on each update, or `append`, which merges the latest update with your existing data.
   - `unique_by`: An optional array of one or more field names whose values will be unique across all your records. When using the `append` update method, the fields in `unique_by` will be used to determine whether new data should update any existing records.
 
-##### fields
+#### fields
 
-A Dataset can hold up to 10 fields. The fields you declare should map directly to the columns that result from your SELECT query, in the **same order**.
+A Dataset can hold up to 10 fields. The fields you declare should map directly to the columns that result from your `SELECT` query, in the **same order**.
 
 For example:
 
@@ -130,13 +142,3 @@ fields:
    key: some_unique_key
    type: number
 ```
-
-### 3. Run the script
-
-Make sure that the SQL-Dataset app and your config file are in the same folder, then from the command line navigate to that folder and run
-
-```
-./sql-dataset -config config.yml
-```
-
-Where `config.yml` is the name of your config file. Once you see confirmation that everything ran successfully, head over to Geckoboard and [start using your new Dataset to build widgets](https://support.geckoboard.com/hc/en-us/articles/223190488-Guide-to-using-datasets)!
