@@ -1,16 +1,20 @@
 # Geckoboard SQL-Dataset
 
-Cross Platform command line application to configure SQL datasources to push data into your Geckoboard datasets.
+Quickly and easily send data from MySQL, Postgres and SQLite databases to Geckoboard Datasets.
 
-## Getting Started
+SQL-Dataset is a command line app that takes the hassle out of integrating your database with Geckoboard. Rather than having to work with client libraries and write a bunch of code to connect to and query your database, with SQL-Dataset all you need to do is fill out a simple config file.
 
-Click on the following operating system to get started
+SQL-Dataset is available for macOS, Linux, and Windows. 
 
-##### [Windows](docs/windows_setup.md)
-##### [MacOSX](docs/macosx_setup.md)
-##### [Linux](docs/linux_setup.md)
+## How to use SQL-Dataset
 
-### Configuration file
+### 1. Download the app
+
+* [macOS](docs/macosx_setup.md)
+* [Linux](docs/linux_setup.md)
+* [Windows](docs/windows_setup.md)
+
+### 2. Create a config file
 
 As a starting point download the following [example config](docs/example.yml) - from here remove attributes you won't need and update the others.
 
