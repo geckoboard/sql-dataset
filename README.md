@@ -16,7 +16,7 @@ SQL-Dataset is available for macOS, Linux, and Windows.
 
 ### 2. Create a config file
 
-SQL-Datasets works by reading all of the information it needs from a YAML file. We've prepared an [example one](docs/example.yml) for you so you can get started quickly.
+SQL-Datasets works by reading all of the information it needs from a YAML file. We've prepared an [example one](docs/example.yml) for you so you can get started quickly. The fields are fairly self-explanatory, but you can learn more about them below.
 
 #### geckoboard_api_key
 
@@ -24,26 +24,39 @@ Hopefully this is obvious, but this is where your Geckoboard API key goes. You c
 
 #### database
 
-```yml
-database:
- driver: mysql
- host: 
- port: 3306
- username: jon_n
- password: my_password
- name: database_name
- tls_config:
-  ca_file: path/to/file
-  key_file: path/to/file
-  cert_file: path/to/file
-  ssl_mode: xxxx
+Enter the type of database you're connecting to in the `driver` field. SQL-Dataset supports:
+
+- `mysql`
+- `postgres`
+- `sqlite`
+
+If you'd like to see support for another type of database, please raise a [support ticket](https://support.geckoboard.com/hc/en-us/requests/new?ticket_form_id=39437) or, if you're technically inclined, make the change and submit a pull request!
+
+Only three parameters are required:
+
+- `driver`
+- `username`
+- `name`
+
+The other attributes, such as `host` and `port`, will default to their driver-specific values unless overridden.
+
+**A note on user accounts** - we _strongly_ recommend that the user account you use with SQL-Dataset has the lowest level of permission necessary. For example, a user account which is only permitted to perform `SELECT` statements on the tables you're going to be using. Like any SQL program, SQL-Dataset will run any query you give it, which includes destructive operations such as overwriting existing data, removing records, and dropping tables. We can't be held responsible for any adverse changes to your database due to accidentally running such a query.
+
+If your database requires a CA cert or a x509 key/cert pair, you can supply this in `tls_config` under the database key.
+
+```yaml
+tls_config:
+ ca_file: /path/to/file.pem
+ key_file: /path/to/file.key 
+ cert_file: /path/to/cert.crt
+ ssl_mode: (optional)
 ```
 
-The `driver` can be either `mysql`, `postgres` or `sqlite`.
+The possible values for `ssl_mode` depend on the database you're using:
 
-`host`, `port`, `username`, `password` and `name` are the credentials you use to connect to your database.
-
-`tls_config` is where you specify... [JON HELP].
+- MySQL: `true`, `skip-verify`
+- Postgres: `disable`, `require`, `verify-ca`, `verify-full`
+- SQLite: N/A
 
 #### refresh_time_sec
 
