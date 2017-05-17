@@ -1,4 +1,4 @@
-# Geckoboard SQL-Dataset
+# SQL-Dataset, by Geckoboard
 
 Quickly and easily send data from MySQL, Postgres and SQLite databases to Geckoboard Datasets.
 
@@ -40,7 +40,7 @@ Only three parameters are required:
 
 The other attributes, such as `host` and `port`, will default to their driver-specific values unless overridden.
 
-**A note on user accounts** - we _strongly_ recommend that the user account you use with SQL-Dataset has the lowest level of permission necessary. For example, a user account which is only permitted to perform `SELECT` statements on the tables you're going to be using. Like any SQL program, SQL-Dataset will run any query you give it, which includes destructive operations such as overwriting existing data, removing records, and dropping tables. We can't be held responsible for any adverse changes to your database due to accidentally running such a query.
+##### SSL
 
 If your database requires a CA cert or a x509 key/cert pair, you can supply this in `tls_config` under the database key.
 
@@ -58,53 +58,85 @@ The possible values for `ssl_mode` depend on the database you're using:
 - Postgres: `disable`, `require`, `verify-ca`, `verify-full`
 - SQLite: N/A
 
+##### A note on user permissions
+
+We _strongly_ recommend that the user account you use with SQL-Dataset has the lowest level of permission necessary. For example, one which is only permitted to perform `SELECT` statements on the tables you're going to be using. Like any SQL program, SQL-Dataset will run any query you give it, which includes destructive operations such as overwriting existing data, removing records, and dropping tables. We accept no responsibility for any adverse changes to your database due to accidentally running such a query.
+
 #### refresh_time_sec
 
-Once started, SQL-Dataset will run your queries periodically and push the results to Geckoboard. Use this field to specify the time, in seconds, between refreshes.
+Once started, SQL-Dataset can run your queries periodically and push the results to Geckoboard. Use this field to specify the time, in seconds, between refreshes.
+
+If you do not wish for SQL-Dataset to run on a schedule, omit this option from your config.
 
 #### datasets
 
+Here's where the magic happens - specify the SQL queries you want to run, and the Datasets you want to push their results into.
+
+ - `name`: The name of your Dataset
+ - `sql`: Your SQL query
+ - `fields`: The schema of the Dataset into which the results of your SQL query will be parsed
+ - `update_type`: Either `replace`, which overwrites the contents of the Dataset with new data on each update, or `append`, which merges the latest update with your existing data.
+  - `unique_by`: An optional array of one or more field names whose values will be unique across all your records. When using the `append` update method, the fields in `unique_by` will be used to determine whether new data should update any existing records.
+
+##### fields
+
+A Dataset can hold up to 10 fields. The fields you declare should map directly to the columns that result from your SELECT query, in the **same order**.
+
+For example:
+
+```yaml
+sql: SELECT date, orders, refunds FROM sales
+fields:
+ - name: Date
+   type: date
+ - name: Orders
+   type: number
+ - name: Refunds
+   type: number
 ```
-datasets:
- - name: dataset.name
-   update_type: replace
-   sql: >
-    SELECT 1, 0.34, string
-    FROM table
-   fields:
-    - type: number
-      name: Count
-    - type: percentage
-      name: Some Percent
-    - type: string
-      name: Some Label
+
+SQL-Dataset supports all of the field types supported by the [Datasets API](https://developer.geckoboard.com):
+
+- date
+- datetime
+- number
+- percentage
+- string
+- money
+
+The `money` field type requires a `currency_code` to be provided:
+
+```yaml
+fields
+ - name: MRR
+   type: money
+   currency_code: USD
 ```
 
-Here's where you specify the SQL queries you want to run, and the Datasets you want to push their results into.
+Numeric field types can support null values. For a field to support this, pass the `optional` key:
 
-Below are some references for the different dataset fields and database configurations for sqlite, postgres and mysql.
+```yaml
+fields:
+ - name: A field which might be NULL
+   type: number
+   optional: true
+```
 
-#### Top Level config options
+The Datasets API requires both a `name` and a `key` for each field, but SQL-Dataset will infer a `key` for you. Sometimes, however, the inferred `key` might not be permitted by the API. If you encounter such a case, you can supply a specific `key` value for that field.
 
-Apart from the database and dataset top level keys there are two more one liners
+```yaml
+fields:
+ - name: Your awesome field
+   key: some_unique_key
+   type: number
+```
 
-##### Refresh Interval
+### 3. Run the script
 
-The refresh interval describes whether the program should act as a scheduled process, and repeat the query at a set interval. For example you might want to push data every 10 seconds to the dataset. This is possible with the option `refresh_time_sec: 10`
+Make sure that the SQL-Dataset app and your config file are in the same folder, then from the command line navigate to that folder and run
 
-##### Geckoboard API Key
+```
+./sql-dataset -config config.yml
+```
 
-This is just you Geckoboard API key for which you can retrieve from your Account section once logged into your Geckoboard account.
-
-##### [Database attributes](docs/database_fields.md)
-##### [Dataset & Field attributes](docs/dataset_fields.md)
-
-
-### Build the widget from the Dataset
-
-Head over to Geckoboard, and
-
- - Click 'Add Widget', and select the Datasets integration.
- - In the pop-out panel that appears you should see your new dataset.
- - You can use this to build a widget showing your data.
- - This will auto update every x seconds based on the config key value `refresh_time_sec`
+Where `config.yml` is the name of your config file. Once you see confirmation that everything ran successfully, head over to Geckoboard and [start using your new Dataset to build widgets](https://support.geckoboard.com/hc/en-us/articles/223190488-Guide-to-using-datasets)!
