@@ -68,7 +68,9 @@ fields:
    optional: true
 ```
 
-### Field unique key
+### Field name and key
+
+Once your field name is set do not change it. Changing the field name will invalidate your dataset
 
 Some field names might be the same or will not be permitted as a key to Geckoboard, in these cases you can supply a specific key value for any field with the `key` attribute.
 
