@@ -384,7 +384,7 @@ func TestSendAllData(t *testing.T) {
 				},
 			},
 			maxRows: 3,
-			err:     fmt.Sprintf(errMoreRowsToSend, 3, 4),
+			err:     fmt.Sprintf(errMoreRowsToSend, 4, 3),
 		},
 		{
 			//Append dataset sends all data in batches
