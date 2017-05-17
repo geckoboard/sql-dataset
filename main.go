@@ -52,31 +52,39 @@ func main() {
 	}
 
 	dc.URL = s
+	client := NewClient(config.GeckoboardAPIKey)
 
 	if config.RefreshTimeSec == 0 {
-		fmt.Println("No refresh timer specified will process once and exit\n")
-		processAllDatasets(config)
+		fmt.Printf("No refresh timer specified will process once and exit\n")
+		processAllDatasets(config, client)
 	} else {
 		fmt.Printf("Refresh timer specified run every %d seconds until interrupted\n\n", config.RefreshTimeSec)
 		for {
-			processAllDatasets(config)
+			processAllDatasets(config, client)
 			time.Sleep(time.Duration(config.RefreshTimeSec) * time.Second)
 		}
 	}
 }
 
-func processAllDatasets(config *models.Config) (hasErrored bool) {
+func processAllDatasets(config *models.Config, client *Client) (hasErrored bool) {
 	for _, ds := range config.Datasets {
 		datasetRecs, err := ds.BuildDataset(config.DatabaseConfig)
 		if err != nil {
-			fmt.Printf("Dataset '%s' errored: %s\n", ds.Name, err)
+			printErrorMsg(ds.Name, err)
 			hasErrored = true
 			continue
 		}
 
-		err = PushData(ds, datasetRecs, config.GeckoboardAPIKey)
+		err = client.FindOrCreateDataset(&ds)
 		if err != nil {
-			fmt.Printf("Dataset '%s' errored: %s\n", ds.Name, err)
+			printErrorMsg(ds.Name, err)
+			hasErrored = true
+			continue
+		}
+
+		err = client.SendAllData(&ds, datasetRecs)
+		if err != nil {
+			printErrorMsg(ds.Name, err)
 			hasErrored = true
 			continue
 		}
@@ -85,4 +93,8 @@ func processAllDatasets(config *models.Config) (hasErrored bool) {
 	}
 
 	return hasErrored
+}
+
+func printErrorMsg(name string, err error) {
+	fmt.Printf("Dataset '%s' errored: %s\n", name, err)
 }

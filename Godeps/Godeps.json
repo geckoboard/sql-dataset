@@ -4,10 +4,6 @@
 	"GodepVersion": "v79",
 	"Deps": [
 		{
-			"ImportPath": "github.com/geckoboard/geckoboard-go",
-			"Rev": "1e7c41fd475775d750a3656c7cdf8d31af22c30e"
-		},
-		{
 			"ImportPath": "github.com/go-sql-driver/mysql",
 			"Comment": "v1.3-14-gae5a66d",
 			"Rev": "ae5a66df4d33ba404d639bd0fc9189cd5ee79bcf"

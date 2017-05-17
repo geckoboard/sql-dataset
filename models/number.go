@@ -19,8 +19,7 @@ type Number struct {
 	Type string
 }
 
-//TODO: Allow null for optional fields that support it in Geckoboard
-func (n *Number) Value() interface{} {
+func (n *Number) Value(optional bool) interface{} {
 	switch n.Type {
 	case intType:
 		return n.Int64
@@ -29,6 +28,10 @@ func (n *Number) Value() interface{} {
 	case float64Type:
 		return n.Float64
 	default:
+		if optional {
+			return nil
+		}
+
 		return 0
 	}
 }

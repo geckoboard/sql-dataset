@@ -31,6 +31,59 @@ func TestDatasetValidate(t *testing.T) {
 		},
 		{
 			Dataset{
+				Name:       "c",
+				UpdateType: Replace,
+				SQL:        "SELECT 1",
+				Fields:     []Field{{Name: "count", Type: "number"}},
+			},
+			[]string{"Dataset name is invalid, should be 3 or more characters with only lowercase alphanumeric characters, dots, hyphens, and underscores"},
+		},
+		{
+			Dataset{
+				Name:       "cd",
+				UpdateType: Replace,
+				SQL:        "SELECT 1",
+				Fields:     []Field{{Name: "count", Type: "number"}},
+			},
+			[]string{"Dataset name is invalid, should be 3 or more characters with only lowercase alphanumeric characters, dots, hyphens, and underscores"},
+		},
+		{
+			Dataset{
+				Name:       ".bbc",
+				UpdateType: Replace,
+				SQL:        "SELECT 1",
+				Fields:     []Field{{Name: "count", Type: "number"}},
+			},
+			[]string{"Dataset name is invalid, should be 3 or more characters with only lowercase alphanumeric characters, dots, hyphens, and underscores"},
+		},
+		{
+			Dataset{
+				Name:       "ABCwat",
+				UpdateType: Replace,
+				SQL:        "SELECT 1",
+				Fields:     []Field{{Name: "count", Type: "number"}},
+			},
+			[]string{"Dataset name is invalid, should be 3 or more characters with only lowercase alphanumeric characters, dots, hyphens, and underscores"},
+		},
+		{
+			Dataset{Name: "abc wat",
+				UpdateType: Replace,
+				SQL:        "SELECT 1",
+				Fields:     []Field{{Name: "count", Type: "number"}},
+			},
+			[]string{"Dataset name is invalid, should be 3 or more characters with only lowercase alphanumeric characters, dots, hyphens, and underscores"},
+		},
+		{
+			Dataset{
+				Name:       "-wat",
+				UpdateType: Replace,
+				SQL:        "SELECT 1",
+				Fields:     []Field{{Name: "count", Type: "number"}},
+			},
+			[]string{"Dataset name is invalid, should be 3 or more characters with only lowercase alphanumeric characters, dots, hyphens, and underscores"},
+		},
+		{
+			Dataset{
 				Name:       "users.count",
 				UpdateType: Replace,
 				SQL:        "SELECT * FROM some_funky_table;",
@@ -39,6 +92,42 @@ func TestDatasetValidate(t *testing.T) {
 			[]string{
 				"Unknown field type 'numbre' supported field types [number date datetime money percentage string]",
 			},
+		},
+		{
+			Dataset{
+				Name:       "app",
+				UpdateType: Replace,
+				SQL:        "SELECT * FROM some_funky_table;",
+				Fields:     []Field{{Name: "count", Type: MoneyType, CurrencyCode: "USD"}},
+			},
+			nil,
+		},
+		{
+			Dataset{
+				Name:       "a-abc",
+				UpdateType: Replace,
+				SQL:        "SELECT * FROM some_funky_table;",
+				Fields:     []Field{{Name: "count", Type: MoneyType, CurrencyCode: "USD"}},
+			},
+			nil,
+		},
+		{
+			Dataset{
+				Name:       "abc_abc",
+				UpdateType: Replace,
+				SQL:        "SELECT * FROM some_funky_table;",
+				Fields:     []Field{{Name: "count", Type: MoneyType, CurrencyCode: "USD"}},
+			},
+			nil,
+		},
+		{
+			Dataset{
+				Name:       "12abc",
+				UpdateType: Replace,
+				SQL:        "SELECT * FROM some_funky_table;",
+				Fields:     []Field{{Name: "count", Type: MoneyType, CurrencyCode: "USD"}},
+			},
+			nil,
 		},
 		{
 			Dataset{

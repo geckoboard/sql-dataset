@@ -16,6 +16,7 @@ datasets:
    fields:
      - type: number
        name: count
+       optional: true
      - type: string
        name: org
      - type: money

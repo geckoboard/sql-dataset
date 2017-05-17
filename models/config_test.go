@@ -178,7 +178,7 @@ func TestLoadConfig(t *testing.T) {
 						UpdateType: Replace,
 						SQL:        "SELECT o.plan_type, count(*) user_count FROM users u, organisation o where o.user_id = u.id AND o.plan_type <> 'trial' order by user_count DESC limit 10",
 						Fields: []Field{
-							{Name: "count", Type: NumberType},
+							{Name: "count", Type: NumberType, Optional: true},
 							{Name: "org", Type: StringType},
 							{Name: "Total Earnings", Type: MoneyType, CurrencyCode: "USD"},
 						},

@@ -37,7 +37,7 @@ func (ds Dataset) BuildDataset(dc *DatabaseConfig) (DatasetRows, error) {
 
 			switch f.Type {
 			case NumberType, MoneyType, PercentageType:
-				data[k] = col.(*Number).Value()
+				data[k] = col.(*Number).Value(f.Optional)
 			case StringType:
 				data[k] = col.(*null.String).String
 			case DateType:
