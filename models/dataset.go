@@ -23,6 +23,7 @@ const (
 
 var (
 	datasetNameRegexp = regexp.MustCompile(`(?)^[0-9a-z][0-9a-z._\-]{1,}[0-9a-z]$`)
+	fieldIdRegexp     = regexp.MustCompile(`[^a-z0-9 ]+|[\W]+$|^[\W]+`)
 )
 
 var fieldTypes = []FieldType{
@@ -58,7 +59,10 @@ func (f Field) KeyValue() string {
 		return f.Key
 	}
 
-	return strings.ToLower(strings.Replace(f.Name, " ", "_", -1))
+	// Remove any characters not alphanumeric or space and replace with nothing
+	key := fieldIdRegexp.ReplaceAllString(strings.ToLower(f.Name), "")
+
+	return strings.Replace(key, " ", "_", -1)
 }
 
 // BuildSchemaFields creates a map[string]Field of
@@ -102,6 +106,10 @@ func (ds Dataset) Validate() (errors []string) {
 		errors = append(errors, f.Validate()...)
 	}
 
+	if err := ds.validateGeneratedFieldKeysUnique(); err != "" {
+		errors = append(errors, err)
+	}
+
 	return errors
 }
 
@@ -128,4 +136,26 @@ func (f Field) Validate() (errors []string) {
 	}
 
 	return errors
+}
+
+func (ds Dataset) validateGeneratedFieldKeysUnique() string {
+	uniqueNameMap := make(map[string]interface{})
+	var names []string
+
+	for _, f := range ds.Fields {
+		k := f.KeyValue()
+		if uniqueNameMap[k] == nil {
+			uniqueNameMap[k] = struct{}{}
+			continue
+		}
+
+		names = append(names, f.Name)
+	}
+
+	if len(names) > 0 {
+		msg := `The field names "%s" will create duplicate keys. Please revise using a unique combination of letters and numbers.`
+		return fmt.Sprintf(msg, strings.Join(names, `", "`))
+	}
+
+	return ""
 }

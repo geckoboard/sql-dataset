@@ -206,30 +206,3 @@ func TestLoadConfig(t *testing.T) {
 		}
 	}
 }
-
-func TestFieldKeyValue(t *testing.T) {
-	ds := Dataset{
-		Fields: []Field{
-			{
-				Key:  "customKey",
-				Name: "Percent Complete",
-				Type: PercentageType,
-			},
-			{
-				Name: "Total Cost",
-				Type: MoneyType,
-			},
-		},
-	}
-
-	customKey := "customKey"
-	normalKey := "total_cost"
-
-	if key := ds.Fields[0].KeyValue(); key != customKey {
-		t.Errorf("Expected keyvalue '%s' but got '%s'", customKey, key)
-	}
-
-	if key := ds.Fields[1].KeyValue(); key != normalKey {
-		t.Errorf("Expected keyvalue '%s' but got '%s'", normalKey, key)
-	}
-}
