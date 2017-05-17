@@ -95,6 +95,65 @@ func TestDatasetValidate(t *testing.T) {
 		},
 		{
 			Dataset{
+				Name:       "some.dataset",
+				UpdateType: Replace,
+				SQL:        "SELECT 1;",
+				Fields: []Field{
+					{
+						Name: "Unique",
+						Type: NumberType,
+					},
+					{
+						Name: "counts",
+						Type: NumberType,
+					},
+					{
+						Name: "Count's",
+						Type: NumberType,
+					},
+					{
+						Name:         "Total Cost",
+						Type:         MoneyType,
+						CurrencyCode: "USD",
+					},
+				},
+			},
+			[]string{`The field names "Count's" will create duplicate keys. Please revise using a unique combination of letters and numbers.`},
+		},
+		{
+			Dataset{
+				Name:       "some.dataset",
+				UpdateType: Replace,
+				SQL:        "SELECT 1;",
+				Fields: []Field{
+					{
+						Name: "Unique",
+						Type: NumberType,
+					},
+					{
+						Name: "counts",
+						Type: NumberType,
+					},
+					{
+						Name: "Count's",
+						Type: NumberType,
+					},
+					{
+						Name:         "Total Cost.",
+						Type:         MoneyType,
+						CurrencyCode: "USD",
+					},
+					{
+						Name:         "Total C.o.S.t",
+						Type:         MoneyType,
+						CurrencyCode: "USD",
+					},
+				},
+			},
+			[]string{`The field names "Count's", "Total C.o.S.t" will create duplicate keys. Please revise using a unique combination of letters and numbers.`},
+		},
+		{
+			Dataset{
 				Name:       "app",
 				UpdateType: Replace,
 				SQL:        "SELECT * FROM some_funky_table;",
@@ -186,6 +245,99 @@ func TestDatasetValidate(t *testing.T) {
 
 		if !reflect.DeepEqual(err, tc.err) {
 			t.Errorf("[%d] Expected errors %#v but got %#v", i, tc.err, err)
+		}
+	}
+}
+
+func TestFieldKeyValue(t *testing.T) {
+	testCases := []struct {
+		field Field
+		out   string
+	}{
+		{
+			Field{
+				Key:  "customKey",
+				Name: "Percent Complete",
+				Type: PercentageType,
+			},
+			"customKey",
+		},
+		{
+			Field{
+				Name: "Total Cost",
+				Type: MoneyType,
+			},
+			"total_cost",
+		},
+		{
+			Field{
+				Name: "Total's",
+				Type: MoneyType,
+			},
+			"totals",
+		},
+		{
+			Field{
+				Name: "MRR. Tot",
+				Type: MoneyType,
+			},
+			"mrr_tot",
+		},
+		{
+			Field{
+				Name: "_MRR. T-",
+				Type: MoneyType,
+			},
+			"mrr_t",
+		},
+		{
+			Field{
+				Name: "_MRR. Tot_",
+				Type: MoneyType,
+			},
+			"mrr_tot",
+		},
+		{
+			Field{
+				Name: "Random Names'",
+				Type: MoneyType,
+			},
+			"random_names",
+		},
+		{
+			Field{
+				Name: "2nd stage",
+				Type: MoneyType,
+			},
+			"2nd_stage",
+		},
+		{
+			Field{
+				Name: " extra whitespace ",
+				Type: MoneyType,
+			},
+			"extra_whitespace",
+		},
+		{
+			Field{
+				Name: "  extra  whitespace   ",
+				Type: MoneyType,
+			},
+			"extra__whitespace",
+		},
+		{
+			// Let the server validate length
+			Field{
+				Name: "mr",
+				Type: MoneyType,
+			},
+			"mr",
+		},
+	}
+
+	for _, tc := range testCases {
+		if key := tc.field.KeyValue(); key != tc.out {
+			t.Errorf("Expected keyvalue '%s' but got '%s'", tc.out, key)
 		}
 	}
 }
