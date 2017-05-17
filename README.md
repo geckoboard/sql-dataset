@@ -16,7 +16,58 @@ SQL-Dataset is available for macOS, Linux, and Windows.
 
 ### 2. Create a config file
 
-As a starting point download the following [example config](docs/example.yml) - from here remove attributes you won't need and update the others.
+SQL-Datasets works by reading all of the information it needs from a YAML file. We've prepared an [example one](docs/example.yml) for you so you can get started quickly.
+
+#### geckoboard_api_key
+
+Hopefully this is obvious, but this is where your Geckoboard API key goes. You can find yours [here](https://app.geckoboard.com/account/details).
+
+#### database
+
+```yml
+database:
+ driver: mysql
+ host: 
+ port: 3306
+ username: jon_n
+ password: my_password
+ name: database_name
+ tls_config:
+  ca_file: path/to/file
+  key_file: path/to/file
+  cert_file: path/to/file
+  ssl_mode: xxxx
+```
+
+The `driver` can be either `mysql`, `postgres` or `sqlite`.
+
+`host`, `port`, `username`, `password` and `name` are the credentials you use to connect to your database.
+
+`tls_config` is where you specify... [JON HELP].
+
+#### refresh_time_sec
+
+Once started, SQL-Dataset will run your queries periodically and push the results to Geckoboard. Use this field to specify the time, in seconds, between refreshes.
+
+#### datasets
+
+```
+datasets:
+ - name: dataset.name
+   update_type: replace
+   sql: >
+    SELECT 1, 0.34, string
+    FROM table
+   fields:
+    - type: number
+      name: Count
+    - type: percentage
+      name: Some Percent
+    - type: string
+      name: Some Label
+```
+
+Here's where you specify the SQL queries you want to run, and the Datasets you want to push their results into.
 
 Below are some references for the different dataset fields and database configurations for sqlite, postgres and mysql.
 
