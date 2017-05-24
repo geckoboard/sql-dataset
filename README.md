@@ -10,9 +10,13 @@ SQL-Dataset is available for macOS, Linux, and Windows.
 
 ### 1. Download the app
 
-* [macOS](docs/macosx_setup.md)
-* [Linux](docs/linux_setup.md)
-* [Windows](docs/windows_setup.md)
+* [macOS](https://github.com/geckoboard/sql-dataset/releases/download/v0.1.0/sql-dataset-darwin-10.10-amd64)
+* Linux [x86](https://github.com/geckoboard/sql-dataset/releases/download/v0.1.0/sql-dataset-linux-386) / [x64](https://github.com/geckoboard/sql-dataset/releases/download/v0.1.0/sql-dataset-linux-amd64)
+* Windows [x86](https://github.com/geckoboard/sql-dataset/releases/download/v0.1.0/sql-dataset-windows-8.0-386.exe) / [x64](https://github.com/geckoboard/sql-dataset/releases/download/v0.1.0/sql-dataset-windows-8.0-amd64.exe)
+
+#### Make it executable (macOS / Linux)
+
+On macOS and Linux you'll need to open a terminal and run `chmod u+x path/to/file` (replacing `path/to/file` with the actual path to your downloaded app) in order to make the app executable.
 
 ### 2. Create a config file
 
