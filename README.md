@@ -20,7 +20,7 @@ On macOS and Linux you'll need to open a terminal and run `chmod u+x path/to/fil
 
 ### 2. Create a config file
 
-SQL-Datasets works by reading all of the information it needs from a YAML file. We've prepared an [example one](docs/example.yml) for you so you can get started quickly. The fields are fairly self-explanatory, but you can learn more about them below.
+SQL-Datasets works by reading all of the information it needs from a YAML file. We've prepared an [example one](docs/example.yml) for you so you can get started quickly. The fields are fairly self-explanatory, but you can learn more about them [below](https://github.com/geckoboard/sql-dataset/blob/feature/readme/README.md#building-your-config-file).
 
 ### 3. Run the script
 
