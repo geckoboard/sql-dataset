@@ -34,6 +34,36 @@ Where `config.yml` is the name of your config file. Once you see confirmation th
 
 ## Building your config file
 
+```yaml
+geckoboard_api_key: your_api_key
+database:
+ driver: mysql
+ host: xxxx
+ port: xxxx
+ username: xxxx
+ password: xxxx
+ name: xxxx
+ tls_config:
+  ca_file: xxxx
+  key_file: xxxx
+  cert_file: xxxx
+  ssl_mode: xxxx
+refresh_time_sec: 60
+datasets:
+ - name: dataset.name
+   update_type: replace
+   sql: >
+    SELECT 1, 0.34, source
+    FROM table
+   fields:
+    - type: number
+      name: Signups
+    - type: percentage
+      name: Conversion rate
+    - type: string
+      name: Source
+```
+
 ### geckoboard_api_key
 
 Hopefully this is obvious, but this is where your Geckoboard API key goes. You can find yours [here](https://app.geckoboard.com/account/details).
