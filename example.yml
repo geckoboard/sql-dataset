@@ -1,0 +1,27 @@
+geckoboard_api_key: your_api_key
+database:
+ driver: mysql
+ host: xxxx
+ port: xxxx
+ username: xxxx
+ password: xxxx
+ name: xxxx
+ tls_config:
+  ca_file: xxxx
+  key_file: xxxx
+  cert_file: xxxx
+  ssl_mode: xxxx
+refresh_time_sec: 60
+datasets:
+ - name: dataset.name
+   update_type: replace
+   sql: >
+    SELECT 1, 0.34, string
+    FROM table
+   fields:
+    - type: number
+      name: Count
+    - type: percentage
+      name: Some Percent
+    - type: string
+      name: Some Label
