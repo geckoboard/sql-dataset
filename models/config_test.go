@@ -1,6 +1,7 @@
 package models
 
 import (
+	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
@@ -110,21 +111,25 @@ func TestValidate(t *testing.T) {
 func TestLoadConfig(t *testing.T) {
 	testCases := []struct {
 		in     string
+		envs   map[string]string
 		config *Config
 		err    string
 	}{
 		{
 			"",
 			nil,
+			nil,
 			"File path is required to load config",
 		},
 		{
 			filepath.Join("fixtures", "invalid_config.yml"),
 			nil,
+			nil,
 			"Error occurred parsing the config: yaml: did not find expected key",
 		},
 		{
 			filepath.Join("fixtures", "valid_config.yml"),
+			nil,
 			&Config{
 				GeckoboardAPIKey: "1234dsfd21322",
 				DatabaseConfig: &DatabaseConfig{
@@ -159,6 +164,7 @@ func TestLoadConfig(t *testing.T) {
 		},
 		{
 			filepath.Join("fixtures", "valid_config2.yml"),
+			nil,
 			&Config{
 				GeckoboardAPIKey: "1234dsfd21322",
 				DatabaseConfig: &DatabaseConfig{
@@ -187,9 +193,78 @@ func TestLoadConfig(t *testing.T) {
 			},
 			"",
 		},
+		{
+			filepath.Join("fixtures", "valid_config_all_envs.yml"),
+			map[string]string{
+				"TEST_API_KEY": "1234abc",
+				"TEST_DB_HOST": "some-host",
+				"TEST_DB_USER": "joe_bloggs",
+				"TEST_DB_PASS": "pa331$",
+				"TEST_DB_PORT": "4403",
+				"TEST_DB_NAME": "myDBName",
+			},
+			&Config{
+				GeckoboardAPIKey: "1234abc",
+				DatabaseConfig: &DatabaseConfig{
+					Driver:   PostgresDriver,
+					Host:     "some-host",
+					Port:     "4403",
+					Database: "myDBName",
+					Username: "joe_bloggs",
+					Password: "pa331$",
+					TLSConfig: &TLSConfig{
+						SSLMode: "verify-full",
+					},
+				},
+				RefreshTimeSec: 60,
+				Datasets: []Dataset{
+					{
+						Name:       "some.number",
+						UpdateType: Replace,
+						SQL:        "SELECT 124",
+						Fields: []Field{
+							{Name: "count", Type: NumberType},
+						},
+					},
+				},
+			},
+			"",
+		},
+		{
+			filepath.Join("fixtures", "valid_config_with_missing_envs.yml"),
+			nil,
+			&Config{
+				DatabaseConfig: &DatabaseConfig{
+					Driver:   PostgresDriver,
+					Protocol: "unix",
+					Host:     "{{ }}",
+					Database: "{{ INVAL^&ID }}",
+					Username: "{{ AGAIN INVALID }}",
+					Password: "{{ NOT-VALID }}",
+				},
+				RefreshTimeSec: 60,
+				Datasets: []Dataset{
+					{
+						Name:       "some.number",
+						UpdateType: Replace,
+						SQL:        "SELECT 124",
+						Fields: []Field{
+							{Name: "count", Type: NumberType},
+						},
+					},
+				},
+			},
+			"",
+		},
 	}
 
 	for i, tc := range testCases {
+		if len(tc.envs) > 0 {
+			for k, v := range tc.envs {
+				os.Setenv(k, v)
+			}
+		}
+
 		c, err := LoadConfig(tc.in)
 
 		if tc.err == "" && err != nil {
