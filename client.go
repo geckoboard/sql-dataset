@@ -29,8 +29,9 @@ type DataPayload struct {
 }
 
 var (
-	gbHost  = "https://api.geckoboard.com"
-	maxRows = 500
+	gbHost    = "https://api.geckoboard.com"
+	userAgent = fmt.Sprintf("SQL-Dataset/%s-%s", version, gitSHA)
+	maxRows   = 500
 
 	errUnexpectedResponse = errors.New("Unexpected server error response from Geckoboard")
 	errMoreRowsToSend     = "You're trying to send %d records, but we " +
@@ -123,6 +124,8 @@ func (c *Client) makeRequest(method, path string, body interface{}) (resp *http.
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Set("User-Agent", userAgent)
 
 	req.SetBasicAuth(c.apiKey, "")
 	return c.client.Do(req)

@@ -11,10 +11,20 @@ import (
 	"github.com/geckoboard/sql-dataset/models"
 )
 
-var configFile = flag.String("config", "sql-dataset.yml", "Config file to load")
+var (
+	configFile     = flag.String("config", "sql-dataset.yml", "Config file to load")
+	displayVersion = flag.Bool("version", false, "Displays version info")
+	version        = ""
+	gitSHA         = ""
+)
 
 func main() {
 	flag.Parse()
+
+	if *displayVersion {
+		fmt.Printf("Version: %s\nGitSHA: %s\n", version, gitSHA)
+		os.Exit(0)
+	}
 
 	config, err := models.LoadConfig(*configFile)
 
