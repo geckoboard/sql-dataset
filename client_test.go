@@ -29,6 +29,8 @@ const (
 )
 
 func TestFindOrCreateDataset(t *testing.T) {
+	userAgent = "SQL-Dataset/test-fake"
+
 	testCases := []struct {
 		dataset  models.Dataset
 		request  request
@@ -181,6 +183,11 @@ func TestFindOrCreateDataset(t *testing.T) {
 			auth := r.Header.Get("Authorization")
 			if auth != expAuth {
 				t.Errorf("Expected authorization header '%s' but got '%s'", expAuth, auth)
+			}
+
+			ua := r.Header.Get("User-Agent")
+			if ua != userAgent {
+				t.Errorf("Expected user header '%s' but got '%s'", userAgent, ua)
 			}
 
 			if r.URL.Path != tc.request.Path {
