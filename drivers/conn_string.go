@@ -31,6 +31,8 @@ func NewConnStringBuilder(driver string) (ConnStringBuilder, error) {
 		return mysql{}, nil
 	case models.SQLiteDriver:
 		return sqlite{}, nil
+	case models.MSSQLDriver:
+		return mssql{}, nil
 	default:
 		return nil, fmt.Errorf("Unknown driver %s to build connection string", driver)
 	}
