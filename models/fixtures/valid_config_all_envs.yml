@@ -1,0 +1,19 @@
+---
+geckoboard_api_key: "{{ TEST_API_KEY }}"
+database:
+ driver: postgres
+ username: "{{TEST_DB_USER}}"
+ password: "{{  TEST_DB_PASS  }}"
+ host: "{{TEST_DB_HOST }}"
+ port: "{{ TEST_DB_PORT }}"
+ name: "{{ TEST_DB_NAME}}"
+ tls_config:
+   ssl_mode: "verify-full"
+refresh_time_sec: 60
+datasets:
+ - name: some.number
+   update_type: replace
+   sql: SELECT 124
+   fields:
+     - type: 'number'
+       name: "count"

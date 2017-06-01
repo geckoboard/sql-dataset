@@ -34,6 +34,8 @@ Where `config.yml` is the name of your config file. Once you see confirmation th
 
 ## Building your config file
 
+Here's what an example config file looks like:
+
 ```yaml
 geckoboard_api_key: your_api_key
 database:
@@ -62,6 +64,14 @@ datasets:
       name: Conversion rate
     - type: string
       name: Source
+```
+
+#### Environment variables
+
+If you wish, you can provide any of `geckoboard_api_key`, `host`, `port`, `username`, `password` and (database) `name` as environment variables with the syntax `"{{ YOUR_CUSTOM_ENV }}"`. Make sure to keep the quotes in there! For example:
+
+```yaml
+geckoboard_api_key: "{{ GB_API_KEY }}"
 ```
 
 ### geckoboard_api_key

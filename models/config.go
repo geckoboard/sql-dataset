@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"os"
+	"regexp"
 
 	"gopkg.in/yaml.v2"
 )
@@ -14,8 +16,11 @@ const (
 	SQLiteDriver   = "sqlite3"
 )
 
-var supportedDrivers = []string{MySQLDriver, PostgresDriver, SQLiteDriver}
-var errParseConfigFile = "Error occurred parsing the config: %s"
+var (
+	supportedDrivers   = []string{MySQLDriver, PostgresDriver, SQLiteDriver}
+	errParseConfigFile = "Error occurred parsing the config: %s"
+	interpolateRegex   = regexp.MustCompile(`{{\s*([a-zA-Z0-9_]+)\s*}}`)
+)
 
 type Config struct {
 	GeckoboardAPIKey string          `yaml:"geckoboard_api_key"`
@@ -61,6 +66,8 @@ func LoadConfig(filepath string) (config *Config, err error) {
 		return nil, fmt.Errorf(errParseConfigFile, err)
 	}
 
+	config.replaceSupportedInterpolatedValues()
+
 	return config, nil
 }
 
@@ -101,4 +108,32 @@ func (dc DatabaseConfig) Validate() (errors []string) {
 	}
 
 	return errors
+}
+
+func (c *Config) replaceSupportedInterpolatedValues() {
+	c.GeckoboardAPIKey = convertEnvToValue(c.GeckoboardAPIKey)
+
+	if c.DatabaseConfig != nil {
+		dc := c.DatabaseConfig
+
+		dc.Username = convertEnvToValue(dc.Username)
+		dc.Password = convertEnvToValue(dc.Password)
+		dc.Host = convertEnvToValue(dc.Host)
+		dc.Database = convertEnvToValue(dc.Database)
+		dc.Port = convertEnvToValue(dc.Port)
+	}
+}
+
+func convertEnvToValue(value string) string {
+	if value == "" {
+		return ""
+	}
+
+	keys := interpolateRegex.FindStringSubmatch(value)
+
+	if len(keys) != 2 {
+		return value
+	}
+
+	return os.Getenv(keys[1])
 }
