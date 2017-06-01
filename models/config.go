@@ -14,6 +14,7 @@ const (
 	MySQLDriver    = "mysql"
 	PostgresDriver = "postgres"
 	SQLiteDriver   = "sqlite3"
+	MSSQLDriver    = "mssql"
 )
 
 var (
