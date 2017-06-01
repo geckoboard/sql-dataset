@@ -1693,12 +1693,12 @@ func TestBuildDatasetMSSQLDriver(t *testing.T) {
 			//NumberType as optional and is null returns null
 			config: Config{
 				DatabaseConfig: &DatabaseConfig{
-					Driver: SQLiteDriver,
-					URL:    "fixtures/db.sqlite",
+					Driver: MSSQLDriver,
+					URL:    env,
 				},
 				Datasets: []Dataset{
 					{
-						SQL: `SELECT "test", NULL`,
+						SQL: `SELECT 'test', NULL`,
 						Fields: []Field{
 							{Name: "App", Type: StringType},
 							{Name: "Run time", Type: NumberType, Optional: true},
@@ -1716,7 +1716,8 @@ func TestBuildDatasetMSSQLDriver(t *testing.T) {
 	}
 
 	for idx, tc := range testCases {
-		out, err := tc.config.Datasets[0].BuildDataset(tc.config.DatabaseConfig)
+		db := NewDBConnection(t, tc.config.DatabaseConfig.Driver, tc.config.DatabaseConfig.URL)
+		out, err := tc.config.Datasets[0].BuildDataset(tc.config.DatabaseConfig, db)
 
 		if tc.err == "" && err != nil {
 			t.Errorf("[%d] Expected no error but got %s", idx, err)

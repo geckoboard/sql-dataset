@@ -316,6 +316,141 @@ func TestNewConnStringBuilder(t *testing.T) {
 				"verify-full",
 			),
 		},
+		// MSSQL Driver
+		{
+			in: models.DatabaseConfig{
+				Driver: models.MSSQLDriver,
+			},
+			err: ErrDatabaseRequired.Error(),
+		},
+		{
+			in: models.DatabaseConfig{
+				Driver:   models.MSSQLDriver,
+				Database: "some_name",
+			},
+			err: ErrUsernameRequired.Error(),
+		},
+		{
+			in: models.DatabaseConfig{
+				Driver:   models.MSSQLDriver,
+				Username: "root",
+				Database: "someDB",
+			},
+			out: "odbc:server={localhost};port=1433;user id={root};;database=someDB;ApplicationIntent=ReadOnly",
+		},
+		{
+			in: models.DatabaseConfig{
+				Driver:   models.MSSQLDriver,
+				Username: "root",
+				Password: "fp123",
+				Database: "someDB",
+			},
+			out: "odbc:server={localhost};port=1433;user id={root};password={fp123};database=someDB;ApplicationIntent=ReadOnly",
+		},
+		{
+			in: models.DatabaseConfig{
+				Driver:   models.MSSQLDriver,
+				Username: "root",
+				Password: "fp123",
+				Database: "someDB",
+				Host:     "fake-host",
+			},
+			out: "odbc:server={fake-host};port=1433;user id={root};password={fp123};database=someDB;ApplicationIntent=ReadOnly",
+		},
+		{
+			in: models.DatabaseConfig{
+				Driver:   models.MSSQLDriver,
+				Username: "root",
+				Password: "fp123",
+				Database: "someDB",
+				Host:     "fake-host",
+				Port:     "5433",
+			},
+			out: "odbc:server={fake-host};port=5433;user id={root};password={fp123};database=someDB;ApplicationIntent=ReadOnly",
+		},
+		{
+			in: models.DatabaseConfig{
+				Driver:   models.MSSQLDriver,
+				Username: "root",
+				Password: "fp123",
+				Database: "someDB",
+				Params: map[string]string{
+					"": "",
+				},
+			},
+			out: "odbc:server={localhost};port=1433;user id={root};password={fp123};database=someDB;ApplicationIntent=ReadOnly",
+		},
+		{
+			in: models.DatabaseConfig{
+				Driver:   models.MSSQLDriver,
+				Username: "root",
+				Password: "fp123",
+				Database: "someDB",
+				Params: map[string]string{
+					"connection timeout": "10",
+					"dial timeout":       "2",
+				},
+			},
+			out: "odbc:server={localhost};port=1433;user id={root};password={fp123};database=someDB;ApplicationIntent=ReadOnly;connection timeout=10;dial timeout=2",
+		},
+		{
+			// ca cert file path
+			in: models.DatabaseConfig{
+				Driver:   models.MSSQLDriver,
+				Username: "root",
+				Password: "fp123",
+				Database: "someDB",
+				Host:     "fake-host",
+				TLSConfig: &models.TLSConfig{
+					CAFile: filepath.Join("models", "fixtures", "ca.cert.pem"),
+				},
+			},
+			out: fmt.Sprintf("odbc:server={fake-host};port=1433;user id={root};password={fp123};database=someDB;ApplicationIntent=ReadOnly;certificate=%s", filepath.Join("models", "fixtures", "ca.cert.pem")),
+		},
+		{
+			// ca cert file path
+			in: models.DatabaseConfig{
+				Driver:   models.MSSQLDriver,
+				Username: "root",
+				Password: "fp123",
+				Database: "someDB",
+				Host:     "fake-host",
+				TLSConfig: &models.TLSConfig{
+					CAFile:  "fakeCAFile",
+					SSLMode: "true",
+				},
+				Params: map[string]string{
+					"hostNameInCertificate": "overriddenHost",
+				},
+			},
+			out: "odbc:server={fake-host};port=1433;user id={root};password={fp123};database=someDB;ApplicationIntent=ReadOnly;certificate=fakeCAFile;encrypt=true;hostNameInCertificate=overriddenHost",
+		},
+		{
+			// key file path supplied not permitted
+			in: models.DatabaseConfig{
+				Driver:   models.MSSQLDriver,
+				Username: "root",
+				Password: "fp123",
+				Database: "someDB",
+				TLSConfig: &models.TLSConfig{
+					KeyFile: filepath.Join("models", "fixtures", "test.key"),
+				},
+			},
+			err: "Key file not supported, only ca_file is for MSSQL Driver",
+		},
+		{
+			// key file path supplied not permitted
+			in: models.DatabaseConfig{
+				Driver:   models.MSSQLDriver,
+				Username: "root",
+				Password: "fp123",
+				Database: "someDB",
+				TLSConfig: &models.TLSConfig{
+					CertFile: filepath.Join("models", "fixtures", "test.crt"),
+				},
+			},
+			err: "Cert file not supported, only ca_file is for MSSQL Driver",
+		},
 		// None existing driver
 		// This really should never happen because of config validation
 		{
