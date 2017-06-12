@@ -241,9 +241,15 @@ func TestEndToEndFlow(t *testing.T) {
 		}))
 
 		client := NewClient("fakeKey")
+		dc := tc.config.DatabaseConfig
+		db, err := newDBConnection(dc.Driver, dc.URL)
+		if err != nil {
+			t.Fatal(err)
+		}
+
 		gbHost = gbWS.URL
 
-		bol := processAllDatasets(&tc.config, client)
+		bol := processAllDatasets(&tc.config, client, db)
 
 		if tc.expectError != bol {
 			t.Errorf("[%d] Expected hasErrors to be %t but got %t", i, tc.expectError, bol)

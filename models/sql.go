@@ -20,9 +20,9 @@ type DatasetRows []map[string]interface{}
 
 // BuildDataset calls queryDatasource to query the datasource for a
 // dataset entry and builds up a slice of rows ready for processing by the client
-func (ds Dataset) BuildDataset(dc *DatabaseConfig) (DatasetRows, error) {
+func (ds Dataset) BuildDataset(dc *DatabaseConfig, db *sql.DB) (DatasetRows, error) {
 	var datasetRecs DatasetRows
-	recs, err := ds.queryDatasource(dc)
+	recs, err := ds.queryDatasource(dc, db)
 
 	if err != nil {
 		return nil, err
@@ -63,12 +63,7 @@ func (ds Dataset) BuildDataset(dc *DatabaseConfig) (DatasetRows, error) {
 	return datasetRecs, nil
 }
 
-func (ds Dataset) queryDatasource(dc *DatabaseConfig) (records []interface{}, err error) {
-	db, err := sql.Open(dc.Driver, dc.URL)
-	if err != nil {
-		return nil, fmt.Errorf("Database open failed: %s", err)
-	}
-
+func (ds Dataset) queryDatasource(dc *DatabaseConfig, db *sql.DB) (records []interface{}, err error) {
 	rows, err := db.Query(ds.SQL)
 
 	if err != nil {
