@@ -10,9 +10,9 @@ SQL-Dataset is available for macOS, Linux, and Windows.
 
 ### 1. Download the app
 
-* [macOS](https://github.com/geckoboard/sql-dataset/releases/download/v0.1.1/sql-dataset-darwin-10.10-amd64)
-* Linux [x86](https://github.com/geckoboard/sql-dataset/releases/download/v0.1.1/sql-dataset-linux-386) / [x64](https://github.com/geckoboard/sql-dataset/releases/download/v0.1.1/sql-dataset-linux-amd64)
-* Windows [x86](https://github.com/geckoboard/sql-dataset/releases/download/v0.1.1/sql-dataset-windows-8.0-386.exe) / [x64](https://github.com/geckoboard/sql-dataset/releases/download/v0.1.1/sql-dataset-windows-8.0-amd64.exe)
+* [macOS](https://github.com/geckoboard/sql-dataset/releases/download/v0.1.2/sql-dataset-darwin-10.10-amd64)
+* Linux [x86](https://github.com/geckoboard/sql-dataset/releases/download/v0.1.2/sql-dataset-linux-386) / [x64](https://github.com/geckoboard/sql-dataset/releases/download/v0.1.2/sql-dataset-linux-amd64)
+* Windows [x86](https://github.com/geckoboard/sql-dataset/releases/download/v0.1.2/sql-dataset-windows-8.0-386.exe) / [x64](https://github.com/geckoboard/sql-dataset/releases/download/v0.1.2/sql-dataset-windows-8.0-amd64.exe)
 
 #### Make it executable (macOS / Linux)
 

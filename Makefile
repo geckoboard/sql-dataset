@@ -1,5 +1,5 @@
 BUILD_DIR=builds
-VERSION=0.1.0
+VERSION=0.1.2
 GIT_SHA=$(shell git rev-parse --short HEAD)
 
 build:
