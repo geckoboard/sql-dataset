@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"flag"
 	"fmt"
 	"log"
@@ -54,31 +55,35 @@ func main() {
 		os.Exit(1)
 	}
 
-	s, err := b.Build(dc)
+	dsn, err := b.Build(dc)
 
 	if err != nil {
 		fmt.Println("Error occurred building connection string:", err)
 		os.Exit(1)
 	}
 
-	dc.URL = s
 	client := NewClient(config.GeckoboardAPIKey)
+	db, err := newDBConnection(dc.Driver, dsn)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 
 	if config.RefreshTimeSec == 0 {
 		fmt.Printf("No refresh timer specified will process once and exit\n")
-		processAllDatasets(config, client)
+		processAllDatasets(config, client, db)
 	} else {
 		fmt.Printf("Refresh timer specified run every %d seconds until interrupted\n\n", config.RefreshTimeSec)
 		for {
-			processAllDatasets(config, client)
+			processAllDatasets(config, client, db)
 			time.Sleep(time.Duration(config.RefreshTimeSec) * time.Second)
 		}
 	}
 }
 
-func processAllDatasets(config *models.Config, client *Client) (hasErrored bool) {
+func processAllDatasets(config *models.Config, client *Client, db *sql.DB) (hasErrored bool) {
 	for _, ds := range config.Datasets {
-		datasetRecs, err := ds.BuildDataset(config.DatabaseConfig)
+		datasetRecs, err := ds.BuildDataset(config.DatabaseConfig, db)
 		if err != nil {
 			printErrorMsg(ds.Name, err)
 			hasErrored = true
@@ -107,4 +112,16 @@ func processAllDatasets(config *models.Config, client *Client) (hasErrored bool)
 
 func printErrorMsg(name string, err error) {
 	fmt.Printf("Dataset '%s' errored: %s\n", name, err)
+}
+
+func newDBConnection(driver, url string) (*sql.DB, error) {
+	pool, err := sql.Open(driver, url)
+
+	if err != nil {
+		return nil, fmt.Errorf("Database open failed: %s", err)
+	}
+
+	pool.SetMaxOpenConns(5)
+
+	return pool, err
 }

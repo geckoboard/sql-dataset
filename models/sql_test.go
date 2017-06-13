@@ -418,7 +418,8 @@ func TestBuildDatasetSQLiteDriver(t *testing.T) {
 	}
 
 	for idx, tc := range testCases {
-		out, err := tc.config.Datasets[0].BuildDataset(tc.config.DatabaseConfig)
+		db := NewDBConnection(t, tc.config.DatabaseConfig.Driver, tc.config.DatabaseConfig.URL)
+		out, err := tc.config.Datasets[0].BuildDataset(tc.config.DatabaseConfig, db)
 
 		if tc.err == "" && err != nil {
 			t.Errorf("[%d] Expected no error but got %s", idx, err)
@@ -850,7 +851,8 @@ func TestBuildDatasetPostgresDriver(t *testing.T) {
 	}
 
 	for idx, tc := range testCases {
-		out, err := tc.config.Datasets[0].BuildDataset(tc.config.DatabaseConfig)
+		db := NewDBConnection(t, tc.config.DatabaseConfig.Driver, tc.config.DatabaseConfig.URL)
+		out, err := tc.config.Datasets[0].BuildDataset(tc.config.DatabaseConfig, db)
 
 		if tc.err == "" && err != nil {
 			t.Errorf("[%d] Expected no error but got %s", idx, err)
@@ -1282,7 +1284,8 @@ func TestBuildDatasetMySQLDriver(t *testing.T) {
 	}
 
 	for idx, tc := range testCases {
-		out, err := tc.config.Datasets[0].BuildDataset(tc.config.DatabaseConfig)
+		db := NewDBConnection(t, tc.config.DatabaseConfig.Driver, tc.config.DatabaseConfig.URL)
+		out, err := tc.config.Datasets[0].BuildDataset(tc.config.DatabaseConfig, db)
 
 		if tc.err == "" && err != nil {
 			t.Errorf("[%d] Expected no error but got %s", idx, err)
@@ -1317,4 +1320,14 @@ func parseTime(str string, t *testing.T) time.Time {
 
 	return tme
 
+}
+
+func NewDBConnection(t *testing.T, driver, url string) *sql.DB {
+	pool, err := sql.Open(driver, url)
+
+	if err != nil {
+		t.Fatalf("Database open failed: %s", err)
+	}
+
+	return pool
 }
