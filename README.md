@@ -1,6 +1,6 @@
 # SQL-Dataset, by Geckoboard
 
-Quickly and easily send data from MySQL, Postgres and SQLite databases to Geckoboard Datasets.
+Quickly and easily send data from Microsoft SQL Server, MySQL, Postgres and SQLite databases to Geckoboard Datasets.
 
 SQL-Dataset is a command line app that takes the hassle out of integrating your database with Geckoboard. Rather than having to work with client libraries and write a bunch of code to connect to and query your database, with SQL-Dataset all you need to do is fill out a simple config file.
 
@@ -10,9 +10,9 @@ SQL-Dataset is available for macOS, Linux, and Windows.
 
 ### 1. Download the app
 
-* [macOS](https://github.com/geckoboard/sql-dataset/releases/download/v0.1.2/sql-dataset-darwin-10.10-amd64)
-* Linux [x86](https://github.com/geckoboard/sql-dataset/releases/download/v0.1.2/sql-dataset-linux-386) / [x64](https://github.com/geckoboard/sql-dataset/releases/download/v0.1.2/sql-dataset-linux-amd64)
-* Windows [x86](https://github.com/geckoboard/sql-dataset/releases/download/v0.1.2/sql-dataset-windows-8.0-386.exe) / [x64](https://github.com/geckoboard/sql-dataset/releases/download/v0.1.2/sql-dataset-windows-8.0-amd64.exe)
+* [macOS](https://github.com/geckoboard/sql-dataset/releases/download/v0.2.0/sql-dataset-darwin-10.10-amd64)
+* Linux [x86](https://github.com/geckoboard/sql-dataset/releases/download/v0.2.0/sql-dataset-linux-386) / [x64](https://github.com/geckoboard/sql-dataset/releases/download/v0.2.0/sql-dataset-linux-amd64)
+* Windows [x86](https://github.com/geckoboard/sql-dataset/releases/download/v0.2.0/sql-dataset-windows-8.0-386.exe) / [x64](https://github.com/geckoboard/sql-dataset/releases/download/v0.2.0/sql-dataset-windows-8.0-amd64.exe)
 
 #### Make it executable (macOS / Linux)
 
@@ -82,6 +82,7 @@ Hopefully this is obvious, but this is where your Geckoboard API key goes. You c
 
 Enter the type of database you're connecting to in the `driver` field. SQL-Dataset supports:
 
+- `mssql`
 - `mysql`
 - `postgres`
 - `sqlite`
