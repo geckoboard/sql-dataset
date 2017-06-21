@@ -14,10 +14,11 @@ const (
 	MySQLDriver    = "mysql"
 	PostgresDriver = "postgres"
 	SQLiteDriver   = "sqlite3"
+	MSSQLDriver    = "mssql"
 )
 
 var (
-	supportedDrivers   = []string{MySQLDriver, PostgresDriver, SQLiteDriver}
+	supportedDrivers   = []string{MSSQLDriver, MySQLDriver, PostgresDriver, SQLiteDriver}
 	errParseConfigFile = "Error occurred parsing the config: %s"
 	interpolateRegex   = regexp.MustCompile(`{{\s*([a-zA-Z0-9_]+)\s*}}`)
 )

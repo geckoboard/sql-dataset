@@ -40,7 +40,7 @@ func TestValidate(t *testing.T) {
 				},
 			},
 			[]string{
-				"Unsupported driver 'pear' only [mysql postgres sqlite3] are supported",
+				"Unsupported driver 'pear' only [mssql mysql postgres sqlite3] are supported",
 			},
 		},
 		{
@@ -60,6 +60,17 @@ func TestValidate(t *testing.T) {
 				DatabaseConfig: &DatabaseConfig{
 					Driver: MySQLDriver,
 					URL:    "mysql://localhost/testdb",
+				},
+			},
+			nil,
+		},
+		{
+			Config{
+				GeckoboardAPIKey: "1234-12345",
+				RefreshTimeSec:   120,
+				DatabaseConfig: &DatabaseConfig{
+					Driver: MSSQLDriver,
+					URL:    "odbc:server={name};user id={userb};password=test;database=dbname",
 				},
 			},
 			nil,
