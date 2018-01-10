@@ -479,7 +479,7 @@ func TestBuildDatasetPostgresDriver(t *testing.T) {
 				RefreshTimeSec:   120,
 				DatabaseConfig: &DatabaseConfig{
 					Driver: PostgresDriver,
-					URL:    "postgres://postgresql:postgres@fakehost:5432",
+					URL:    "postgres://postgresql:postgres@127.0.0.1:9999",
 				},
 				Datasets: []Dataset{
 					{
@@ -494,7 +494,7 @@ func TestBuildDatasetPostgresDriver(t *testing.T) {
 				},
 			},
 			out: nil,
-			err: "Database query failed: dial tcp: lookup fakehost: no such host",
+			err: "Database query failed: dial tcp 127.0.0.1:9999: getsockopt: connection refused",
 		},
 		{
 			config: Config{
@@ -912,7 +912,7 @@ func TestBuildDatasetMySQLDriver(t *testing.T) {
 				RefreshTimeSec:   120,
 				DatabaseConfig: &DatabaseConfig{
 					Driver: MySQLDriver,
-					URL:    "root@tcp(fakehost:3306)/testdb",
+					URL:    "root@tcp(127.0.0.1:9999)/testdb",
 				},
 				Datasets: []Dataset{
 					{
@@ -927,7 +927,7 @@ func TestBuildDatasetMySQLDriver(t *testing.T) {
 				},
 			},
 			out: nil,
-			err: "Database query failed: dial tcp: lookup fakehost: no such host",
+			err: "Database query failed: dial tcp 127.0.0.1:9999: getsockopt: connection refused",
 		},
 		{
 			config: Config{
