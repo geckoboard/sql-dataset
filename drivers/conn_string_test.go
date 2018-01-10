@@ -213,7 +213,7 @@ func TestNewConnStringBuilder(t *testing.T) {
 				Username: "root",
 				Database: "someDB",
 			},
-			out: "postgres://root@localhost:5432/someDB",
+			out: "dbname=someDB user=root host=localhost port=5432",
 		},
 		{
 			in: models.DatabaseConfig{
@@ -222,7 +222,7 @@ func TestNewConnStringBuilder(t *testing.T) {
 				Password: "fp123",
 				Database: "someDB",
 			},
-			out: "postgres://root:fp123@localhost:5432/someDB",
+			out: "dbname=someDB user=root password=fp123 host=localhost port=5432",
 		},
 		{
 			in: models.DatabaseConfig{
@@ -232,18 +232,18 @@ func TestNewConnStringBuilder(t *testing.T) {
 				Database: "someDB",
 				Host:     "fake-host",
 			},
-			out: "postgres://root:fp123@fake-host:5432/someDB",
+			out: "dbname=someDB user=root password=fp123 host=fake-host port=5432",
 		},
 		{
 			in: models.DatabaseConfig{
 				Driver:   models.PostgresDriver,
-				Username: "root",
-				Password: "fp123",
+				Username: "root it",
+				Password: "f'p123",
 				Database: "someDB",
 				Host:     "fake-host",
 				Port:     "5433",
 			},
-			out: "postgres://root:fp123@fake-host:5433/someDB",
+			out: `dbname=someDB user='root\ it' password='f\'p123' host=fake-host port=5433`,
 		},
 		{
 			//Unix socket connection
@@ -255,18 +255,18 @@ func TestNewConnStringBuilder(t *testing.T) {
 				Host:     "/var/run/postgresql/.s.PGSQL.5432",
 				Protocol: "unix",
 			},
-			out: "postgres://root:fp123@/var/run/postgresql/.s.PGSQL.5432/someDB",
+			out: "dbname=someDB user=root password=fp123 host=/var/run/postgresql/.s.PGSQL.5432",
 		},
 		{
 			//IPv6 needs to be in square brackets
 			in: models.DatabaseConfig{
 				Driver:   models.PostgresDriver,
 				Username: "root",
-				Password: "fp123",
+				Password: "fp%123",
 				Database: "someDB",
 				Host:     "de:ad:be:ef::ca:fe",
 			},
-			out: "postgres://root:fp123@[de:ad:be:ef::ca:fe]:5432/someDB",
+			out: "dbname=someDB user=root password=fp%123 host=de:ad:be:ef::ca:fe port=5432",
 		},
 		{
 			in: models.DatabaseConfig{
@@ -279,7 +279,7 @@ func TestNewConnStringBuilder(t *testing.T) {
 					"datestyle":       "ISO, MDY",
 				},
 			},
-			out: "postgres://root:fp123@localhost:5432/someDB?client_encoding=utf8mb4&datestyle=ISO, MDY",
+			out: `dbname=someDB user=root password=fp123 host=localhost port=5432 client_encoding=utf8mb4 datestyle='ISO,\ MDY'`,
 		},
 		{
 			// ca cert file path
@@ -293,9 +293,7 @@ func TestNewConnStringBuilder(t *testing.T) {
 					CAFile: filepath.Join("models", "fixtures", "ca.cert.pem"),
 				},
 			},
-			out: fmt.Sprintf("postgres://root:fp123@fake-host:5432/someDB?sslrootcert=%s",
-				filepath.Join("models", "fixtures", "ca.cert.pem"),
-			),
+			out: "dbname=someDB user=root password=fp123 host=fake-host port=5432 sslrootcert=models/fixtures/ca.cert.pem",
 		},
 		{
 			// key and cert file path
@@ -310,11 +308,26 @@ func TestNewConnStringBuilder(t *testing.T) {
 					SSLMode:  "verify-full",
 				},
 			},
-			out: fmt.Sprintf("postgres://root:fp123@localhost:5432/someDB?sslcert=%s&sslkey=%s&sslmode=%s",
+			out: fmt.Sprintf("dbname=someDB user=root password=fp123 host=localhost port=5432 sslcert=%s sslkey=%s sslmode=%s",
 				filepath.Join("models", "fixtures", "test.crt"),
 				filepath.Join("models", "fixtures", "test.key"),
 				"verify-full",
 			),
+		},
+		{
+			// key and cert file path windows path with space
+			in: models.DatabaseConfig{
+				Driver:   models.PostgresDriver,
+				Username: "root",
+				Password: "fp123",
+				Database: "someDB",
+				TLSConfig: &models.TLSConfig{
+					KeyFile:  `C:\Users\ghost\certs and keys\key.file`,
+					CertFile: `C:\Users\ghost\certs and keys\cert.crt`,
+					SSLMode:  "verify-full",
+				},
+			},
+			out: `dbname=someDB user=root password=fp123 host=localhost port=5432 sslcert='C:\\Users\\ghost\\certs\ and\ keys\\cert.crt' sslkey='C:\\Users\\ghost\\certs\ and\ keys\\key.file' sslmode=verify-full`,
 		},
 		// MSSQL Driver
 		{
