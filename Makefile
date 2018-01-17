@@ -1,5 +1,5 @@
 BUILD_DIR=builds
-VERSION=0.2.0
+VERSION=0.2.1
 GIT_SHA=$(shell git rev-parse --short HEAD)
 PASSWORD=root
 MSPASS=zebra-IT-32
