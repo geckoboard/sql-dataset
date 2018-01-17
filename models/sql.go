@@ -7,10 +7,10 @@ import (
 
 	"gopkg.in/guregu/null.v3"
 
+	_ "github.com/denisenkom/go-mssqldb"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
-	_ "github.com/denisenkom/go-mssqldb"
 )
 
 const dateFormat = "2006-01-02"
@@ -22,7 +22,7 @@ type DatasetRows []map[string]interface{}
 // BuildDataset calls queryDatasource to query the datasource for a
 // dataset entry and builds up a slice of rows ready for processing by the client
 func (ds Dataset) BuildDataset(dc *DatabaseConfig, db *sql.DB) (DatasetRows, error) {
-	var datasetRecs DatasetRows
+	datasetRecs := DatasetRows{}
 	recs, err := ds.queryDatasource(dc, db)
 
 	if err != nil {

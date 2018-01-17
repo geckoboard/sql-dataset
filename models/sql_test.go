@@ -415,6 +415,25 @@ func TestBuildDatasetSQLiteDriver(t *testing.T) {
 				},
 			},
 		},
+		{
+			// No rows returns empty slice
+			config: Config{
+				DatabaseConfig: &DatabaseConfig{
+					Driver: SQLiteDriver,
+					URL:    "fixtures/db.sqlite",
+				},
+				Datasets: []Dataset{
+					{
+						SQL: `SELECT "test", null FROM builds WHERE id < 0`,
+						Fields: []Field{
+							{Name: "App", Type: StringType},
+							{Name: "Run time", Type: NumberType, Optional: true},
+						},
+					},
+				},
+			},
+			out: DatasetRows{},
+		},
 	}
 
 	for idx, tc := range testCases {
@@ -427,6 +446,10 @@ func TestBuildDatasetSQLiteDriver(t *testing.T) {
 
 		if err != nil && tc.err != err.Error() {
 			t.Errorf("[%d] Expected error %s but got %s", idx, tc.err, err)
+		}
+
+		if err == nil && out == nil {
+			t.Errorf("expected slice to be initialized when no error but wasn't")
 		}
 
 		if len(out) != len(tc.out) {
@@ -828,12 +851,12 @@ func TestBuildDatasetPostgresDriver(t *testing.T) {
 			//NumberType as optional and is null returns null
 			config: Config{
 				DatabaseConfig: &DatabaseConfig{
-					Driver: SQLiteDriver,
-					URL:    "fixtures/db.sqlite",
+					Driver: PostgresDriver,
+					URL:    env,
 				},
 				Datasets: []Dataset{
 					{
-						SQL: `SELECT "test", null FROM builds limit 1`,
+						SQL: `SELECT 'test', null FROM builds limit 1`,
 						Fields: []Field{
 							{Name: "App", Type: StringType},
 							{Name: "Run time", Type: NumberType, Optional: true},
@@ -848,6 +871,25 @@ func TestBuildDatasetPostgresDriver(t *testing.T) {
 				},
 			},
 		},
+		{
+			// No rows returns empty slice
+			config: Config{
+				DatabaseConfig: &DatabaseConfig{
+					Driver: PostgresDriver,
+					URL:    env,
+				},
+				Datasets: []Dataset{
+					{
+						SQL: `SELECT 'test', null FROM builds WHERE id < 0`,
+						Fields: []Field{
+							{Name: "App", Type: StringType},
+							{Name: "Run time", Type: NumberType, Optional: true},
+						},
+					},
+				},
+			},
+			out: DatasetRows{},
+		},
 	}
 
 	for idx, tc := range testCases {
@@ -860,6 +902,10 @@ func TestBuildDatasetPostgresDriver(t *testing.T) {
 
 		if err != nil && tc.err != err.Error() {
 			t.Errorf("[%d] Expected error %s but got %s", idx, tc.err, err)
+		}
+
+		if err == nil && out == nil {
+			t.Errorf("expected slice to be initialized when no error but wasn't")
 		}
 
 		if len(out) != len(tc.out) {
@@ -1261,8 +1307,8 @@ func TestBuildDatasetMySQLDriver(t *testing.T) {
 			//NumberType as optional and is null returns null
 			config: Config{
 				DatabaseConfig: &DatabaseConfig{
-					Driver: SQLiteDriver,
-					URL:    "fixtures/db.sqlite",
+					Driver: MySQLDriver,
+					URL:    env,
 				},
 				Datasets: []Dataset{
 					{
@@ -1281,6 +1327,25 @@ func TestBuildDatasetMySQLDriver(t *testing.T) {
 				},
 			},
 		},
+		{
+			// No rows returns empty slice
+			config: Config{
+				DatabaseConfig: &DatabaseConfig{
+					Driver: MySQLDriver,
+					URL:    env,
+				},
+				Datasets: []Dataset{
+					{
+						SQL: `SELECT "test", null FROM builds WHERE id < 0`,
+						Fields: []Field{
+							{Name: "App", Type: StringType},
+							{Name: "Run time", Type: NumberType, Optional: true},
+						},
+					},
+				},
+			},
+			out: DatasetRows{},
+		},
 	}
 
 	for idx, tc := range testCases {
@@ -1293,6 +1358,10 @@ func TestBuildDatasetMySQLDriver(t *testing.T) {
 
 		if err != nil && tc.err != err.Error() {
 			t.Errorf("[%d] Expected error %s but got %s", idx, tc.err, err)
+		}
+
+		if err == nil && out == nil {
+			t.Errorf("expected slice to be initialized when no error but wasn't")
 		}
 
 		if len(out) != len(tc.out) {
@@ -1713,6 +1782,25 @@ func TestBuildDatasetMSSQLDriver(t *testing.T) {
 				},
 			},
 		},
+		{
+			// No rows returns empty slice
+			config: Config{
+				DatabaseConfig: &DatabaseConfig{
+					Driver: MSSQLDriver,
+					URL:    env,
+				},
+				Datasets: []Dataset{
+					{
+						SQL: `SELECT 'test', null FROM builds WHERE id < 0`,
+						Fields: []Field{
+							{Name: "App", Type: StringType},
+							{Name: "Run time", Type: NumberType, Optional: true},
+						},
+					},
+				},
+			},
+			out: DatasetRows{},
+		},
 	}
 
 	for idx, tc := range testCases {
@@ -1727,8 +1815,11 @@ func TestBuildDatasetMSSQLDriver(t *testing.T) {
 			t.Errorf("[%d] Expected error %s but got %s", idx, tc.err, err)
 		}
 
+		if err != nil && tc.err != err.Error() {
+			t.Errorf("[%d] Expected error %s but got %s", idx, tc.err, err)
+		}
+
 		if len(out) != len(tc.out) {
-			fmt.Printf("%#v\n", out)
 			t.Errorf("[%d] Expected slice size %d but got %d", idx, len(tc.out), len(out))
 			continue
 		}
