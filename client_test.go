@@ -292,6 +292,25 @@ func TestSendAllData(t *testing.T) {
 			err: errUnexpectedResponse.Error(),
 		},
 		{
+			//Replace dataset with no data
+			dataset: models.Dataset{
+				Name:       "app.no.data",
+				UpdateType: models.Replace,
+				Fields: []models.Field{
+					{Name: "App", Type: models.StringType},
+					{Name: "Percent", Type: models.PercentageType},
+				},
+			},
+			data: models.DatasetRows{},
+			requests: []request{
+				{
+					Method: http.MethodPut,
+					Path:   "/datasets/app.no.data/data",
+					Body:   `{"data":[]}`,
+				},
+			},
+		},
+		{
 			//Replace dataset under the batch rows limit doesn't error
 			dataset: models.Dataset{
 				Name:       "app.reliable.percent",
@@ -322,6 +341,19 @@ func TestSendAllData(t *testing.T) {
 					Body:   `{"data":[{"app":"acceptance","percent":0.43},{"app":"redis","percent":0.22},{"app":"api","percent":0.66}]}`,
 				},
 			},
+		},
+		{
+			//Append with no data makes no requests
+			dataset: models.Dataset{
+				Name:       "append.no.data",
+				UpdateType: models.Append,
+				Fields: []models.Field{
+					{Name: "App", Type: models.StringType},
+					{Name: "Count", Type: models.NumberType},
+				},
+			},
+			data:     models.DatasetRows{},
+			requests: []request{},
 		},
 		{
 			//Append dataset under the batch rows limit

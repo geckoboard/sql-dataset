@@ -205,6 +205,36 @@ func TestEndToEndFlow(t *testing.T) {
 				},
 			},
 		},
+		{
+			// No data rows retrieved - so should send {'data': []} when type replace
+			config: models.Config{
+				DatabaseConfig: &models.DatabaseConfig{
+					Driver: models.SQLiteDriver,
+					URL:    filepath.Join("models", "fixtures", "db.sqlite"),
+				},
+				Datasets: []models.Dataset{
+					{
+						Name:       "empty.sql.rows",
+						SQL:        `SELECT "test", null FROM builds WHERE id < 0`,
+						UpdateType: models.Replace,
+						Fields: []models.Field{
+							{Name: "App", Type: models.StringType},
+							{Name: "Build Count", Type: models.NumberType, Optional: true},
+						},
+					},
+				},
+			},
+			gbReqs: []GBRequest{
+				{
+					Path: "/datasets/empty.sql.rows",
+					Body: `{"id":"empty.sql.rows","fields":{"app":{"type":"string","name":"App"},"build_count":{"type":"number","name":"Build Count","optional":true}}}`,
+				},
+				{
+					Path: "/datasets/empty.sql.rows/data",
+					Body: `{"data":[]}`,
+				},
+			},
+		},
 	}
 
 	for i, tc := range testCases {
