@@ -83,6 +83,10 @@ func (c Config) Validate() (errors []string) {
 		errors = append(errors, c.DatabaseConfig.Validate()...)
 	}
 
+	if len(c.Datasets) == 0 {
+		errors = append(errors, "At least one dataset is required to run")
+	}
+
 	for _, ds := range c.Datasets {
 		errors = append(errors, ds.Validate()...)
 	}
