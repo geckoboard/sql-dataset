@@ -143,7 +143,7 @@ func TestFindOrCreateDataset(t *testing.T) {
 				code: 400,
 				body: `{"error":{"type":"ErrResourceInvalid","message":"Field name too short"}}`,
 			},
-			err: "response error: Field name too short",
+			err: fmt.Sprintf(errInvalidPayload, "Field name too short"),
 		},
 		{
 			// Verify 201 response correctly handled
@@ -266,7 +266,7 @@ func TestSendAllData(t *testing.T) {
 				code: 400,
 				body: `{"error": {"type":"ErrMissingData", "message": "Missing data for 'app'"}}`,
 			},
-			err: "response error: Missing data for 'app'",
+			err: fmt.Sprintf(errInvalidPayload, "Missing data for 'app'"),
 		},
 		{
 			// Error with 50x

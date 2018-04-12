@@ -68,7 +68,7 @@ func (ds Dataset) queryDatasource(dc *DatabaseConfig, db *sql.DB) (records []int
 	rows, err := db.Query(ds.SQL)
 
 	if err != nil {
-		return nil, fmt.Errorf("Database query failed: %s", err)
+		return nil, fmt.Errorf(errFailedSQLQuery, err)
 	}
 
 	defer rows.Close()
@@ -82,7 +82,7 @@ func (ds Dataset) queryDatasource(dc *DatabaseConfig, db *sql.DB) (records []int
 		err = rows.Scan(rvp...)
 
 		if err != nil {
-			return nil, fmt.Errorf("Scan failed: %s", err)
+			return nil, fmt.Errorf(errParseSQLResultSet, err)
 		}
 
 		records = append(records, rvp)

@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -13,13 +14,11 @@ func TestValidate(t *testing.T) {
 		err    []string
 	}{
 		{
-			Config{
-				GeckoboardAPIKey: "",
-			},
+			Config{},
 			[]string{
-				"Geckoboard api key is required",
-				"Database config is required",
-				"At least one dataset is required to run",
+				errMissingAPIKey,
+				errMissingDBConfig,
+				errNoDatasets,
 			},
 		},
 		{
@@ -28,13 +27,12 @@ func TestValidate(t *testing.T) {
 				DatabaseConfig:   &DatabaseConfig{Driver: "mysql"},
 			},
 			[]string{
-				"At least one dataset is required to run",
+				errNoDatasets,
 			},
 		},
 		{
 			Config{
-				GeckoboardAPIKey: "",
-				DatabaseConfig:   &DatabaseConfig{},
+				DatabaseConfig: &DatabaseConfig{},
 				Datasets: []Dataset{
 					{
 						Name:       "dataset.x",
@@ -47,8 +45,8 @@ func TestValidate(t *testing.T) {
 				},
 			},
 			[]string{
-				"Geckoboard api key is required",
-				"Database driver is required",
+				errMissingAPIKey,
+				errMissingDBDriver,
 			},
 		},
 		{
@@ -70,7 +68,7 @@ func TestValidate(t *testing.T) {
 				},
 			},
 			[]string{
-				"Unsupported driver 'pear' only [mssql mysql postgres sqlite3] are supported",
+				fmt.Sprintf(errDriverNotSupported, "pear", SupportedDrivers),
 			},
 		},
 		{
@@ -153,7 +151,7 @@ func TestValidate(t *testing.T) {
 				},
 			},
 			[]string{
-				"Dataset update type must be append or replace",
+				fmt.Sprintf(errInvalidDatasetUpdateType, "wrong"),
 			},
 		},
 	}
@@ -190,13 +188,13 @@ func TestLoadConfig(t *testing.T) {
 			"",
 			nil,
 			nil,
-			"File path is required to load config",
+			errNoConfigFound,
 		},
 		{
 			filepath.Join("fixtures", "invalid_config.yml"),
 			nil,
 			nil,
-			"Error occurred parsing the config: yaml: did not find expected key",
+			fmt.Sprintf(errParseConfigFile, "yaml: did not find expected key"),
 		},
 		{
 			filepath.Join("fixtures", "valid_config.yml"),
