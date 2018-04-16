@@ -19,12 +19,32 @@ func TestValidate(t *testing.T) {
 			[]string{
 				"Geckoboard api key is required",
 				"Database config is required",
+				"At least one dataset is required to run",
+			},
+		},
+		{
+			Config{
+				GeckoboardAPIKey: "1234",
+				DatabaseConfig:   &DatabaseConfig{Driver: "mysql"},
+			},
+			[]string{
+				"At least one dataset is required to run",
 			},
 		},
 		{
 			Config{
 				GeckoboardAPIKey: "",
 				DatabaseConfig:   &DatabaseConfig{},
+				Datasets: []Dataset{
+					{
+						Name:       "dataset.x",
+						UpdateType: Replace,
+						SQL:        "SELECT count(*) FROM table",
+						Fields: []Field{
+							{Name: "count", Type: NumberType},
+						},
+					},
+				},
 			},
 			[]string{
 				"Geckoboard api key is required",
@@ -38,6 +58,16 @@ func TestValidate(t *testing.T) {
 					Driver: "pear",
 					URL:    "pear://localhost/test",
 				},
+				Datasets: []Dataset{
+					{
+						Name:       "dataset.x",
+						UpdateType: Replace,
+						SQL:        "SELECT count(*) FROM table",
+						Fields: []Field{
+							{Name: "count", Type: NumberType},
+						},
+					},
+				},
 			},
 			[]string{
 				"Unsupported driver 'pear' only [mssql mysql postgres sqlite3] are supported",
@@ -50,6 +80,16 @@ func TestValidate(t *testing.T) {
 					Driver: PostgresDriver,
 					URL:    "mysql://localhost/testdb",
 				},
+				Datasets: []Dataset{
+					{
+						Name:       "dataset.x",
+						UpdateType: Replace,
+						SQL:        "SELECT count(*) FROM table",
+						Fields: []Field{
+							{Name: "count", Type: NumberType},
+						},
+					},
+				},
 			},
 			nil,
 		},
@@ -61,6 +101,16 @@ func TestValidate(t *testing.T) {
 					Driver: MySQLDriver,
 					URL:    "mysql://localhost/testdb",
 				},
+				Datasets: []Dataset{
+					{
+						Name:       "dataset.x",
+						UpdateType: Replace,
+						SQL:        "SELECT count(*) FROM table",
+						Fields: []Field{
+							{Name: "count", Type: NumberType},
+						},
+					},
+				},
 			},
 			nil,
 		},
@@ -71,6 +121,16 @@ func TestValidate(t *testing.T) {
 				DatabaseConfig: &DatabaseConfig{
 					Driver: MSSQLDriver,
 					URL:    "odbc:server={name};user id={userb};password=test;database=dbname",
+				},
+				Datasets: []Dataset{
+					{
+						Name:       "dataset.x",
+						UpdateType: Replace,
+						SQL:        "SELECT count(*) FROM table",
+						Fields: []Field{
+							{Name: "count", Type: NumberType},
+						},
+					},
 				},
 			},
 			nil,
