@@ -111,9 +111,11 @@ tls_config:
 
 The possible values for `ssl_mode` depend on the database you're using:
 
+- MSSQL: `disable`, `false`, `true` - try disable option if you experience connection issues
 - MySQL: `true`, `skip-verify`
 - Postgres: `disable`, `require`, `verify-ca`, `verify-full`
 - SQLite: N/A
+
 
 #### A note on user permissions
 
