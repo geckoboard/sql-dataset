@@ -29,11 +29,11 @@ func (p postgres) Build(dc *models.DatabaseConfig) (string, error) {
 	var buf bytes.Buffer
 
 	if dc.Database == "" {
-		return "", ErrDatabaseRequired
+		return "", errDatabaseRequired
 	}
 
 	if dc.Username == "" {
-		return "", ErrUsernameRequired
+		return "", errUsernameRequired
 	}
 
 	p.setDefaults(dc)

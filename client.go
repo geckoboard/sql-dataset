@@ -33,10 +33,15 @@ var (
 	userAgent = fmt.Sprintf("SQL-Dataset/%s-%s", version, gitSHA)
 	maxRows   = 500
 
-	errUnexpectedResponse = errors.New("Unexpected server error response from Geckoboard")
-	errMoreRowsToSend     = "You're trying to send %d records, but we " +
-		"were only able to send the first %d. To send more, please " +
-		"change your dataset's update_type to 'append'"
+	errInvalidPayload = "There was an error sending the data to Geckoboard's API: %s"
+
+	errUnexpectedResponse = errors.New("Sorry, there seems to be a problem with " +
+		"Geckoboard's servers. Please try again, or check" +
+		"https://geckoboard.statuspage.io")
+
+	errMoreRowsToSend = "You're trying to send %d records, but 'replace' " +
+		"mode only supports sending %d. To send more, please change " +
+		"your dataset's update_type to 'append'\n"
 )
 
 func NewClient(apiKey string) *Client {
@@ -140,7 +145,7 @@ func handleResponse(resp *http.Response) error {
 	case res >= 400 && res < 500:
 		var err Error
 		json.NewDecoder(resp.Body).Decode(&err)
-		return fmt.Errorf("response error: %s", err.Detail.Message)
+		return fmt.Errorf(errInvalidPayload, err.Detail.Message)
 	default:
 		return errUnexpectedResponse
 	}

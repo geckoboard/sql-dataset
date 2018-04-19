@@ -27,14 +27,14 @@ func (ms mssql) Build(dc *models.DatabaseConfig) (string, error) {
 	ms.setDefaults(dc)
 
 	if dc.Database == "" {
-		return "", ErrDatabaseRequired
+		return "", errDatabaseRequired
 	}
 
 	// It might be possible to support Windows single sign on
 	// however this means username can be empty. For now lets not support
 	// not sure what is involved - I think it needs SPN (Kerberos) :(
 	if dc.Username == "" {
-		return "", ErrUsernameRequired
+		return "", errUsernameRequired
 	}
 
 	if err := ms.buildTLSParams(dc); err != nil {

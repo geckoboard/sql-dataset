@@ -18,9 +18,8 @@ const (
 )
 
 var (
-	supportedDrivers   = []string{MSSQLDriver, MySQLDriver, PostgresDriver, SQLiteDriver}
-	errParseConfigFile = "Error occurred parsing the config: %s"
-	interpolateRegex   = regexp.MustCompile(`{{\s*([a-zA-Z0-9_]+)\s*}}`)
+	SupportedDrivers = []string{MSSQLDriver, MySQLDriver, PostgresDriver, SQLiteDriver}
+	interpolateRegex = regexp.MustCompile(`{{\s*([a-zA-Z0-9_]+)\s*}}`)
 )
 
 type Config struct {
@@ -56,7 +55,7 @@ func LoadConfig(filepath string) (config *Config, err error) {
 	var b []byte
 
 	if filepath == "" {
-		return nil, errors.New("File path is required to load config")
+		return nil, errors.New(errNoConfigFound)
 	}
 
 	if b, err = ioutil.ReadFile(filepath); err != nil {
@@ -74,17 +73,17 @@ func LoadConfig(filepath string) (config *Config, err error) {
 
 func (c Config) Validate() (errors []string) {
 	if c.GeckoboardAPIKey == "" {
-		errors = append(errors, "Geckoboard api key is required")
+		errors = append(errors, errMissingAPIKey)
 	}
 
 	if c.DatabaseConfig == nil {
-		errors = append(errors, "Database config is required")
+		errors = append(errors, errMissingDBConfig)
 	} else {
 		errors = append(errors, c.DatabaseConfig.Validate()...)
 	}
 
 	if len(c.Datasets) == 0 {
-		errors = append(errors, "At least one dataset is required to run")
+		errors = append(errors, errNoDatasets)
 	}
 
 	for _, ds := range c.Datasets {
@@ -96,11 +95,11 @@ func (c Config) Validate() (errors []string) {
 
 func (dc DatabaseConfig) Validate() (errors []string) {
 	if dc.Driver == "" {
-		errors = append(errors, "Database driver is required")
+		errors = append(errors, errMissingDBDriver)
 	} else {
 		var matched bool
 
-		for _, d := range supportedDrivers {
+		for _, d := range SupportedDrivers {
 			if d == dc.Driver {
 				matched = true
 				break
@@ -108,7 +107,7 @@ func (dc DatabaseConfig) Validate() (errors []string) {
 		}
 
 		if !matched {
-			errors = append(errors, fmt.Sprintf("Unsupported driver '%s' only %s are supported", dc.Driver, supportedDrivers))
+			errors = append(errors, fmt.Sprintf(errDriverNotSupported, dc.Driver, SupportedDrivers))
 		}
 	}
 

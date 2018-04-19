@@ -15,8 +15,8 @@ const (
 )
 
 var (
-	ErrDatabaseRequired = errors.New("Database is required for a connection")
-	ErrUsernameRequired = errors.New("Username is required for a connection")
+	errDatabaseRequired = errors.New("No database provided.")
+	errUsernameRequired = errors.New("No username provided.")
 )
 
 type ConnStringBuilder interface {
@@ -34,7 +34,7 @@ func NewConnStringBuilder(driver string) (ConnStringBuilder, error) {
 	case models.MSSQLDriver:
 		return mssql{}, nil
 	default:
-		return nil, fmt.Errorf("Unknown driver %s to build connection string", driver)
+		return nil, fmt.Errorf("%s is not supported driver. SQL-Dataset supports %s", driver, models.SupportedDrivers)
 	}
 }
 

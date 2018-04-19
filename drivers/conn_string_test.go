@@ -20,7 +20,7 @@ func TestNewConnStringBuilder(t *testing.T) {
 			in: models.DatabaseConfig{
 				Driver: models.SQLiteDriver,
 			},
-			err: "Database is required for a connection",
+			err: errDatabaseRequired.Error(),
 		},
 		{
 			in: models.DatabaseConfig{
@@ -46,14 +46,14 @@ func TestNewConnStringBuilder(t *testing.T) {
 			in: models.DatabaseConfig{
 				Driver: models.MySQLDriver,
 			},
-			err: ErrDatabaseRequired.Error(),
+			err: errDatabaseRequired.Error(),
 		},
 		{
 			in: models.DatabaseConfig{
 				Driver:   models.MySQLDriver,
 				Database: "some_name",
 			},
-			err: ErrUsernameRequired.Error(),
+			err: errUsernameRequired.Error(),
 		},
 		{
 			in: models.DatabaseConfig{
@@ -164,7 +164,7 @@ func TestNewConnStringBuilder(t *testing.T) {
 					CAFile: filepath.Join("..", "models", "fixtures", "ca.key.pem"),
 				},
 			},
-			err: "Failed to append PEM, is it a valid ca cert ?",
+			err: "SSL error: Failed to append PEM. Please check that it's a valid CA certificate.",
 		},
 		{
 			// ssl only
@@ -198,14 +198,14 @@ func TestNewConnStringBuilder(t *testing.T) {
 			in: models.DatabaseConfig{
 				Driver: models.PostgresDriver,
 			},
-			err: ErrDatabaseRequired.Error(),
+			err: errDatabaseRequired.Error(),
 		},
 		{
 			in: models.DatabaseConfig{
 				Driver:   models.PostgresDriver,
 				Database: "some_name",
 			},
-			err: ErrUsernameRequired.Error(),
+			err: errUsernameRequired.Error(),
 		},
 		{
 			in: models.DatabaseConfig{
@@ -321,14 +321,14 @@ func TestNewConnStringBuilder(t *testing.T) {
 			in: models.DatabaseConfig{
 				Driver: models.MSSQLDriver,
 			},
-			err: ErrDatabaseRequired.Error(),
+			err: errDatabaseRequired.Error(),
 		},
 		{
 			in: models.DatabaseConfig{
 				Driver:   models.MSSQLDriver,
 				Database: "some_name",
 			},
-			err: ErrUsernameRequired.Error(),
+			err: errUsernameRequired.Error(),
 		},
 		{
 			in: models.DatabaseConfig{
@@ -457,7 +457,7 @@ func TestNewConnStringBuilder(t *testing.T) {
 			in: models.DatabaseConfig{
 				Driver: "PearDB",
 			},
-			err:         "Unknown driver PearDB to build connection string",
+			err:         "PearDB is not supported driver. SQL-Dataset supports [mssql mysql postgres sqlite3]",
 			isDriverErr: true,
 		},
 	}

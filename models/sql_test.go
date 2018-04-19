@@ -37,7 +37,7 @@ func TestBuildDatasetSQLiteDriver(t *testing.T) {
 				},
 			},
 			out: nil,
-			err: "Database query failed: unable to open database file",
+			err: fmt.Sprintf(errFailedSQLQuery, "unable to open database file"),
 		},
 		{
 			config: Config{
@@ -56,7 +56,7 @@ func TestBuildDatasetSQLiteDriver(t *testing.T) {
 				},
 			},
 			out: nil,
-			err: `Scan failed: sql: Scan error on column index 0: strconv.ParseInt: parsing "everdeen": invalid syntax`,
+			err: fmt.Sprintf(errParseSQLResultSet, `sql: Scan error on column index 0: strconv.ParseInt: parsing "everdeen": invalid syntax`),
 		},
 		{
 			config: Config{
@@ -75,7 +75,7 @@ func TestBuildDatasetSQLiteDriver(t *testing.T) {
 				},
 			},
 			out: nil,
-			err: `Database query failed: no such column: create_at`,
+			err: `Query failed. This is the error received: no such column: create_at`,
 		},
 		{
 			config: Config{
@@ -94,7 +94,7 @@ func TestBuildDatasetSQLiteDriver(t *testing.T) {
 				},
 			},
 			out: nil,
-			err: `Scan failed: sql: expected 3 destination arguments in Scan, not 2`,
+			err: fmt.Sprintf(errParseSQLResultSet, "sql: expected 3 destination arguments in Scan, not 2"),
 		},
 		{
 			// StringType and Number as an int64
@@ -517,7 +517,7 @@ func TestBuildDatasetPostgresDriver(t *testing.T) {
 				},
 			},
 			out: nil,
-			err: "Database query failed: dial tcp 127.0.0.1:9999: getsockopt: connection refused",
+			err: fmt.Sprintf(errFailedSQLQuery, "dial tcp 127.0.0.1:9999: getsockopt: connection refused"),
 		},
 		{
 			config: Config{
@@ -536,7 +536,7 @@ func TestBuildDatasetPostgresDriver(t *testing.T) {
 				},
 			},
 			out: nil,
-			err: `Scan failed: sql: Scan error on column index 0: can't convert string "" to number`,
+			err: fmt.Sprintf(errParseSQLResultSet, `sql: Scan error on column index 0: can't convert string "" to number`),
 		},
 		{
 			config: Config{
@@ -555,7 +555,7 @@ func TestBuildDatasetPostgresDriver(t *testing.T) {
 				},
 			},
 			out: nil,
-			err: `Database query failed: pq: column "create_at" does not exist`,
+			err: fmt.Sprintf(errFailedSQLQuery, `pq: column "create_at" does not exist`),
 		},
 		{
 			config: Config{
@@ -574,7 +574,7 @@ func TestBuildDatasetPostgresDriver(t *testing.T) {
 				},
 			},
 			out: nil,
-			err: `Database query failed: pq: column "builds.build_cost" must appear in the GROUP BY clause or be used in an aggregate function`,
+			err: fmt.Sprintf(errFailedSQLQuery, `pq: column "builds.build_cost" must appear in the GROUP BY clause or be used in an aggregate function`),
 		},
 		{
 			// StringType and Number as an int64
@@ -973,7 +973,7 @@ func TestBuildDatasetMySQLDriver(t *testing.T) {
 				},
 			},
 			out: nil,
-			err: "Database query failed: dial tcp 127.0.0.1:9999: getsockopt: connection refused",
+			err: fmt.Sprintf(errFailedSQLQuery, "dial tcp 127.0.0.1:9999: getsockopt: connection refused"),
 		},
 		{
 			config: Config{
@@ -992,7 +992,7 @@ func TestBuildDatasetMySQLDriver(t *testing.T) {
 				},
 			},
 			out: nil,
-			err: `Scan failed: sql: Scan error on column index 0: strconv.ParseInt: parsing "everdeen": invalid syntax`,
+			err: fmt.Sprintf(errParseSQLResultSet, `sql: Scan error on column index 0: strconv.ParseInt: parsing "everdeen": invalid syntax`),
 		},
 		{
 			config: Config{
@@ -1011,7 +1011,7 @@ func TestBuildDatasetMySQLDriver(t *testing.T) {
 				},
 			},
 			out: nil,
-			err: `Database query failed: Error 1054: Unknown column 'create_at' in 'field list'`,
+			err: fmt.Sprintf(errFailedSQLQuery, `Error 1054: Unknown column 'create_at' in 'field list'`),
 		},
 		{
 			config: Config{
@@ -1030,7 +1030,7 @@ func TestBuildDatasetMySQLDriver(t *testing.T) {
 				},
 			},
 			out: nil,
-			err: `Database query failed: Error 1055: Expression #2 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'testdb.builds.build_cost' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by`,
+			err: fmt.Sprintf(errFailedSQLQuery, `Error 1055: Expression #2 of SELECT list is not in GROUP BY clause and contains nonaggregated column 'testdb.builds.build_cost' which is not functionally dependent on columns in GROUP BY clause; this is incompatible with sql_mode=only_full_group_by`),
 		},
 		{
 			// StringType and Number as an int64
@@ -1428,7 +1428,7 @@ func TestBuildDatasetMSSQLDriver(t *testing.T) {
 				},
 			},
 			out: nil,
-			err: "Database query failed: Login error: mssql: Login failed for user 'userx'.",
+			err: fmt.Sprintf(errFailedSQLQuery, "Login error: mssql: Login failed for user 'userx'."),
 		},
 		{
 			config: Config{
@@ -1447,7 +1447,7 @@ func TestBuildDatasetMSSQLDriver(t *testing.T) {
 				},
 			},
 			out: nil,
-			err: `Scan failed: sql: Scan error on column index 0: can't convert string "" to number`,
+			err: fmt.Sprintf(errParseSQLResultSet, `sql: Scan error on column index 0: can't convert string "" to number`),
 		},
 		{
 			config: Config{
@@ -1466,7 +1466,7 @@ func TestBuildDatasetMSSQLDriver(t *testing.T) {
 				},
 			},
 			out: nil,
-			err: `Database query failed: mssql: Invalid column name 'create_at'.`,
+			err: fmt.Sprintf(errFailedSQLQuery, `mssql: Invalid column name 'create_at'.`),
 		},
 		{
 			config: Config{
@@ -1485,7 +1485,7 @@ func TestBuildDatasetMSSQLDriver(t *testing.T) {
 				},
 			},
 			out: nil,
-			err: `Database query failed: mssql: Column 'builds.build_cost' is invalid in the select list because it is not contained in either an aggregate function or the GROUP BY clause.`,
+			err: fmt.Sprintf(errFailedSQLQuery, `mssql: Column 'builds.build_cost' is invalid in the select list because it is not contained in either an aggregate function or the GROUP BY clause.`),
 		},
 		{
 			// StringType and Number as an int64

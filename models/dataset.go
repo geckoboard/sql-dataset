@@ -83,23 +83,24 @@ func (ds *Dataset) BuildSchemaFields() {
 
 func (ds Dataset) Validate() (errors []string) {
 	if ds.Name == "" {
-		errors = append(errors, "Dataset name is required")
+		errors = append(errors, errMissingDatasetName)
 	}
 
 	if ds.Name != "" && !datasetNameRegexp.MatchString(ds.Name) {
-		errors = append(errors, "Dataset name is invalid, should be 3 or more characters with only lowercase alphanumeric characters, dots, hyphens, and underscores")
+		errors = append(errors, errInvalidDatasetName)
 	}
 
 	if ds.UpdateType != Append && ds.UpdateType != Replace {
-		errors = append(errors, "Dataset update type must be append or replace")
+		errors = append(errors,
+			fmt.Sprintf(errInvalidDatasetUpdateType, ds.UpdateType))
 	}
 
 	if ds.SQL == "" {
-		errors = append(errors, "Dataset sql is required")
+		errors = append(errors, errMissingDatasetSQL)
 	}
 
 	if len(ds.Fields) == 0 {
-		errors = append(errors, "At least one field is required for a dataset")
+		errors = append(errors, errMissingDatasetFields)
 	}
 
 	for _, f := range ds.Fields {
@@ -124,15 +125,15 @@ func (f Field) Validate() (errors []string) {
 	}
 
 	if !validType {
-		errors = append(errors, fmt.Sprintf("Unknown field type '%s' supported field types %s", f.Type, fieldTypes))
+		errors = append(errors, fmt.Sprintf(errInvalidFieldType, f.Type, fieldTypes))
 	}
 
 	if f.Name == "" {
-		errors = append(errors, "Field name is required")
+		errors = append(errors, errMissingFieldName)
 	}
 
 	if f.Type == MoneyType && f.CurrencyCode == "" {
-		errors = append(errors, "Money type field requires an ISO 4217 currency code")
+		errors = append(errors, errMissingCurrency)
 	}
 
 	return errors
@@ -153,8 +154,7 @@ func (ds Dataset) validateGeneratedFieldKeysUnique() string {
 	}
 
 	if len(names) > 0 {
-		msg := `The field names "%s" will create duplicate keys. Please revise using a unique combination of letters and numbers.`
-		return fmt.Sprintf(msg, strings.Join(names, `", "`))
+		return fmt.Sprintf(errDuplicateFieldNames, strings.Join(names, `", "`))
 	}
 
 	return ""

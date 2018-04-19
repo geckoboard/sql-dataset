@@ -34,7 +34,7 @@ func main() {
 	}
 
 	if errs := config.Validate(); errs != nil {
-		fmt.Println("\nFollowing errors occurred with the config;")
+		fmt.Println("\nThere are errors in your config:")
 
 		for i, err := range errs {
 			fmt.Println(" -", err)
@@ -58,7 +58,8 @@ func main() {
 	dsn, err := b.Build(dc)
 
 	if err != nil {
-		fmt.Println("Error occurred building connection string:", err)
+		fmt.Println("There was an error while trying to build "+
+			"your database connection string:", err)
 		os.Exit(1)
 	}
 
@@ -70,10 +71,9 @@ func main() {
 	}
 
 	if config.RefreshTimeSec == 0 {
-		fmt.Printf("No refresh timer specified will process once and exit\n")
 		processAllDatasets(config, client, db)
 	} else {
-		fmt.Printf("Refresh timer specified run every %d seconds until interrupted\n\n", config.RefreshTimeSec)
+		fmt.Printf("Running every %d seconds, until interrupted.\n\n", config.RefreshTimeSec)
 		for {
 			processAllDatasets(config, client, db)
 			time.Sleep(time.Duration(config.RefreshTimeSec) * time.Second)
@@ -104,21 +104,24 @@ func processAllDatasets(config *models.Config, client *Client, db *sql.DB) (hasE
 			continue
 		}
 
-		fmt.Printf("Dataset '%s' successfully completed\n", ds.Name)
+		fmt.Printf("Successfully updated \"%s\"\n", ds.Name)
 	}
 
 	return hasErrored
 }
 
 func printErrorMsg(name string, err error) {
-	fmt.Printf("Dataset '%s' errored: %s\n", name, err)
+	fmt.Printf("There was an error while trying to update %s: %s", name, err)
 }
 
 func newDBConnection(driver, url string) (*sql.DB, error) {
-	pool, err := sql.Open(driver, url)
+	// Ignore this error which just checks we have the driver loaded
+	pool, _ := sql.Open(driver, url)
+	err := pool.Ping()
 
 	if err != nil {
-		return nil, fmt.Errorf("Database open failed: %s", err)
+		return nil, fmt.Errorf("Failed to open database connection. "+
+			"This is the error received: %s", err)
 	}
 
 	pool.SetMaxOpenConns(5)

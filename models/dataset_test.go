@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 )
@@ -13,20 +14,20 @@ func TestDatasetValidate(t *testing.T) {
 		{
 			Dataset{},
 			[]string{
-				"Dataset name is required",
-				"Dataset update type must be append or replace",
-				"Dataset sql is required",
-				"At least one field is required for a dataset",
+				errMissingDatasetName,
+				fmt.Sprintf(errInvalidDatasetUpdateType, ""),
+				errMissingDatasetSQL,
+				errMissingDatasetFields,
 			},
 		},
 		{
 			Dataset{Fields: []Field{{}}},
 			[]string{
-				"Dataset name is required",
-				"Dataset update type must be append or replace",
-				"Dataset sql is required",
-				"Unknown field type '' supported field types [number date datetime money percentage string]",
-				"Field name is required",
+				errMissingDatasetName,
+				fmt.Sprintf(errInvalidDatasetUpdateType, ""),
+				errMissingDatasetSQL,
+				fmt.Sprintf(errInvalidFieldType, "", fieldTypes),
+				errMissingFieldName,
 			},
 		},
 		{
@@ -36,7 +37,7 @@ func TestDatasetValidate(t *testing.T) {
 				SQL:        "SELECT 1",
 				Fields:     []Field{{Name: "count", Type: "number"}},
 			},
-			[]string{"Dataset name is invalid, should be 3 or more characters with only lowercase alphanumeric characters, dots, hyphens, and underscores"},
+			[]string{errInvalidDatasetName},
 		},
 		{
 			Dataset{
@@ -45,7 +46,7 @@ func TestDatasetValidate(t *testing.T) {
 				SQL:        "SELECT 1",
 				Fields:     []Field{{Name: "count", Type: "number"}},
 			},
-			[]string{"Dataset name is invalid, should be 3 or more characters with only lowercase alphanumeric characters, dots, hyphens, and underscores"},
+			[]string{errInvalidDatasetName},
 		},
 		{
 			Dataset{
@@ -54,7 +55,7 @@ func TestDatasetValidate(t *testing.T) {
 				SQL:        "SELECT 1",
 				Fields:     []Field{{Name: "count", Type: "number"}},
 			},
-			[]string{"Dataset name is invalid, should be 3 or more characters with only lowercase alphanumeric characters, dots, hyphens, and underscores"},
+			[]string{errInvalidDatasetName},
 		},
 		{
 			Dataset{
@@ -63,7 +64,7 @@ func TestDatasetValidate(t *testing.T) {
 				SQL:        "SELECT 1",
 				Fields:     []Field{{Name: "count", Type: "number"}},
 			},
-			[]string{"Dataset name is invalid, should be 3 or more characters with only lowercase alphanumeric characters, dots, hyphens, and underscores"},
+			[]string{errInvalidDatasetName},
 		},
 		{
 			Dataset{Name: "abc wat",
@@ -71,7 +72,7 @@ func TestDatasetValidate(t *testing.T) {
 				SQL:        "SELECT 1",
 				Fields:     []Field{{Name: "count", Type: "number"}},
 			},
-			[]string{"Dataset name is invalid, should be 3 or more characters with only lowercase alphanumeric characters, dots, hyphens, and underscores"},
+			[]string{errInvalidDatasetName},
 		},
 		{
 			Dataset{
@@ -80,7 +81,7 @@ func TestDatasetValidate(t *testing.T) {
 				SQL:        "SELECT 1",
 				Fields:     []Field{{Name: "count", Type: "number"}},
 			},
-			[]string{"Dataset name is invalid, should be 3 or more characters with only lowercase alphanumeric characters, dots, hyphens, and underscores"},
+			[]string{errInvalidDatasetName},
 		},
 		{
 			Dataset{
@@ -89,9 +90,7 @@ func TestDatasetValidate(t *testing.T) {
 				SQL:        "SELECT * FROM some_funky_table;",
 				Fields:     []Field{{Name: "count", Type: "numbre"}},
 			},
-			[]string{
-				"Unknown field type 'numbre' supported field types [number date datetime money percentage string]",
-			},
+			[]string{fmt.Sprintf(errInvalidFieldType, "numbre", fieldTypes)},
 		},
 		{
 			Dataset{
@@ -118,7 +117,7 @@ func TestDatasetValidate(t *testing.T) {
 					},
 				},
 			},
-			[]string{`The field names "Count's" will create duplicate keys. Please revise using a unique combination of letters and numbers.`},
+			[]string{fmt.Sprintf(errDuplicateFieldNames, "Count's")},
 		},
 		{
 			Dataset{
@@ -150,7 +149,7 @@ func TestDatasetValidate(t *testing.T) {
 					},
 				},
 			},
-			[]string{`The field names "Count's", "Total C.o.S.t" will create duplicate keys. Please revise using a unique combination of letters and numbers.`},
+			[]string{fmt.Sprintf(errDuplicateFieldNames, `Count's", "Total C.o.S.t`)},
 		},
 		{
 			Dataset{
@@ -195,9 +194,7 @@ func TestDatasetValidate(t *testing.T) {
 				SQL:        "SELECT * FROM some_funky_table;",
 				Fields:     []Field{{Name: "count", Type: MoneyType}},
 			},
-			[]string{
-				"Money type field requires an ISO 4217 currency code",
-			},
+			[]string{errMissingCurrency},
 		},
 		{
 			Dataset{

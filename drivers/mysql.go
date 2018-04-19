@@ -35,11 +35,11 @@ func (m mysql) Build(dc *models.DatabaseConfig) (string, error) {
 	m.setDefaults(dc)
 
 	if dc.Database == "" {
-		return "", ErrDatabaseRequired
+		return "", errDatabaseRequired
 	}
 
 	if dc.Username == "" {
-		return "", ErrUsernameRequired
+		return "", errUsernameRequired
 	}
 
 	if dc.TLSConfig != nil {
@@ -72,7 +72,8 @@ func (m mysql) loadCerts(keyFile, certFile, caFile string) (*x509.CertPool, []tl
 		}
 
 		if ok := rootCertPool.AppendCertsFromPEM(pem); !ok {
-			return nil, nil, fmt.Errorf("Failed to append PEM, is it a valid ca cert ?")
+			return nil, nil, fmt.Errorf("SSL error: Failed to append PEM. " +
+				"Please check that it's a valid CA certificate.")
 		}
 	}
 
@@ -81,7 +82,8 @@ func (m mysql) loadCerts(keyFile, certFile, caFile string) (*x509.CertPool, []tl
 	if certFile != "" && keyFile != "" {
 		certs, err := tls.LoadX509KeyPair(certFile, keyFile)
 		if err != nil {
-			return nil, nil, fmt.Errorf("Error loading x509 key pair: %s", err)
+			return nil, nil, fmt.Errorf("There was an error while "+
+				"loading your x509 key pair: %s", err)
 		}
 
 		clientCert = append(clientCert, certs)
