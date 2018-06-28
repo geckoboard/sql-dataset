@@ -268,6 +268,27 @@ func TestFieldKeyValue(t *testing.T) {
 		},
 		{
 			Field{
+				Name: "Total_Cost",
+				Type: MoneyType,
+			},
+			"total_cost",
+		},
+		{
+			Field{
+				Name: "_subscribed_at",
+				Type: MoneyType,
+			},
+			"subscribed_at",
+		},
+		{
+			Field{
+				Name: "_subscribed__at_",
+				Type: MoneyType,
+			},
+			"subscribed__at",
+		},
+		{
+			Field{
 				Name: "Total's",
 				Type: MoneyType,
 			},

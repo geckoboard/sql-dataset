@@ -23,7 +23,7 @@ const (
 
 var (
 	datasetNameRegexp = regexp.MustCompile(`(?)^[0-9a-z][0-9a-z._\-]{1,}[0-9a-z]$`)
-	fieldIdRegexp     = regexp.MustCompile(`[^a-z0-9 ]+|[\W]+$|^[\W]+`)
+	fieldIdRegexp     = regexp.MustCompile(`[^a-z0-9_ ]+|[_\W]+$|^[_\W]+`)
 )
 
 var fieldTypes = []FieldType{
