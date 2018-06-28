@@ -111,7 +111,7 @@ func processAllDatasets(config *models.Config, client *Client, db *sql.DB) (hasE
 }
 
 func printErrorMsg(name string, err error) {
-	fmt.Printf("There was an error while trying to update %s: %s", name, err)
+	fmt.Printf("There was an error while trying to update %s: %s\n", name, err)
 }
 
 func newDBConnection(driver, url string) (*sql.DB, error) {

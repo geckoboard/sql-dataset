@@ -67,9 +67,9 @@ func (f Field) KeyValue() string {
 
 // BuildSchemaFields creates a map[string]Field of
 // the dataset fields for sending over to Geckoboard
-func (ds *Dataset) BuildSchemaFields() {
+func (ds *Dataset) BuildSchemaFields() error {
 	if ds.SchemaFields != nil {
-		return
+		return nil
 	}
 
 	fields := make(map[string]Field)
@@ -79,6 +79,59 @@ func (ds *Dataset) BuildSchemaFields() {
 	}
 
 	ds.SchemaFields = fields
+	uniqueByKeys, err := ds.updateUniqueByKeys(fields)
+	if err != nil {
+		return err
+	}
+
+	ds.UniqueBy = uniqueByKeys
+	return nil
+}
+
+func (ds Dataset) updateUniqueByKeys(newFields map[string]Field) ([]string, error) {
+	// We don't want to modify the unique by inline just yet
+	// so that if we need to error to the user we can
+	// This should maintain the same order as the original
+	var newUniqueByKeys []string
+
+	for i, ub := range ds.UniqueBy {
+		matched := false
+		for k := range newFields {
+			if ub == k {
+				matched = true
+				newUniqueByKeys = append(newUniqueByKeys, ub)
+				break
+			}
+		}
+
+		// Do the same the under the hood key update to match
+		// the new field key that may have been generated
+		if !matched {
+			key := fieldIdRegexp.ReplaceAllString(strings.ToLower(ds.UniqueBy[i]), "")
+			newUniqueByKeys = append(newUniqueByKeys, strings.Replace(key, " ", "_", -1))
+		}
+	}
+
+	// Now double check all unique by have matching field
+	for i, ub := range newUniqueByKeys {
+		matched := false
+		for k := range newFields {
+			if ub == k {
+				matched = true
+				break
+			}
+		}
+
+		if !matched {
+			return newUniqueByKeys, fmt.Errorf(
+				"Following unique by '%s' for dataset '%s' has no matching field",
+				ds.UniqueBy[i],
+				ds.Name,
+			)
+		}
+	}
+
+	return newUniqueByKeys, nil
 }
 
 func (ds Dataset) Validate() (errors []string) {
