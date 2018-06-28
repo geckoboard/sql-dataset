@@ -156,7 +156,7 @@ func TestEndToEndFlow(t *testing.T) {
 						Name:       "app.counts",
 						SQL:        "SELECT app_name, count(*) FROM builds GROUP BY app_name order by app_name",
 						UpdateType: models.Append,
-						UniqueBy:   []string{"app_name"},
+						UniqueBy:   []string{"app"},
 						Fields: []models.Field{
 							{Name: "App", Type: models.StringType},
 							{Name: "Build Count", Type: models.NumberType},
@@ -167,13 +167,36 @@ func TestEndToEndFlow(t *testing.T) {
 			gbReqs: []GBRequest{
 				{
 					Path: "/datasets/app.counts",
-					Body: `{"id":"app.counts","unique_by":["app_name"],"fields":{"app":{"type":"string","name":"App"},"build_count":{"type":"number","name":"Build Count"}}}`,
+					Body: `{"id":"app.counts","unique_by":["app"],"fields":{"app":{"type":"string","name":"App"},"build_count":{"type":"number","name":"Build Count"}}}`,
 				},
 				{
 					Path: "/datasets/app.counts/data",
 					Body: `{"data":[{"app":"","build_count":2},{"app":"everdeen","build_count":2},{"app":"geckoboard-ruby","build_count":3},{"app":"react","build_count":1},{"app":"westworld","build_count":1}]}`,
 				},
 			},
+		},
+		{
+			// Unique by without a matching field errors makes no requests
+			config: models.Config{
+				DatabaseConfig: &models.DatabaseConfig{
+					Driver: models.SQLiteDriver,
+					URL:    filepath.Join("models", "fixtures", "db.sqlite"),
+				},
+				Datasets: []models.Dataset{
+					{
+						Name:       "app.counts",
+						SQL:        "SELECT app_name, count(*) FROM builds GROUP BY app_name order by app_name",
+						UpdateType: models.Append,
+						UniqueBy:   []string{"app_name"},
+						Fields: []models.Field{
+							{Name: "App", Type: models.StringType},
+							{Name: "Build Count", Type: models.NumberType},
+						},
+					},
+				},
+			},
+			gbReqs:      []GBRequest{},
+			expectError: true,
 		},
 		{
 			// Optional field correctly sent as null

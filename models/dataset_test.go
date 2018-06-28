@@ -6,6 +6,200 @@ import (
 	"testing"
 )
 
+func TestBuildSchemaFields(t *testing.T) {
+	testCases := []struct {
+		in  *Dataset
+		out *Dataset
+		err string
+	}{
+		{
+			// Field name unaltered
+			in: &Dataset{
+				Name: "users.count",
+				Fields: []Field{
+					{
+						Name: "count",
+						Type: "datetime",
+					},
+				},
+			},
+			out: &Dataset{
+				Name: "users.count",
+				Fields: []Field{
+					{
+						Name: "count",
+						Type: "datetime",
+					},
+				},
+				SchemaFields: map[string]Field{
+					"count": Field{
+						Name: "count",
+						Type: "datetime",
+					},
+				},
+			},
+		},
+		{
+			// Field has key provided
+			in: &Dataset{
+				Name: "users.count",
+				Fields: []Field{
+					{
+						Name: "Count All",
+						Key:  "not_matching",
+						Type: "datetime",
+					},
+				},
+			},
+			out: &Dataset{
+				Name: "users.count",
+				Fields: []Field{
+					{
+						Name: "Count All",
+						Key:  "not_matching",
+						Type: "datetime",
+					},
+				},
+				SchemaFields: map[string]Field{
+					"not_matching": Field{
+						Name: "Count All",
+						Key:  "not_matching",
+						Type: "datetime",
+					},
+				},
+			},
+		},
+		{
+			// Multiple fields
+			in: &Dataset{
+				Name: "users.count",
+				Fields: []Field{
+					{
+						Name: "Count All",
+						Type: "datetime",
+					},
+					{
+						Name: "Service",
+						Key:  "newkey",
+						Type: "string",
+					},
+				},
+			},
+			out: &Dataset{
+				Name: "users.count",
+				Fields: []Field{
+					{
+						Name: "Count All",
+						Type: "datetime",
+					},
+					{
+						Name: "Service",
+						Key:  "newkey",
+						Type: "string",
+					},
+				},
+				SchemaFields: map[string]Field{
+					"count_all": Field{
+						Name: "Count All",
+						Type: "datetime",
+					},
+					"newkey": {
+						Name: "Service",
+						Key:  "newkey",
+						Type: "string",
+					},
+				},
+			},
+		},
+		{
+			// Unique not matching any fields
+			in: &Dataset{
+				Name: "users.count",
+				Fields: []Field{
+					{
+						Name: "count",
+						Type: "datetime",
+					},
+				},
+				UniqueBy: []string{"count", "blah"},
+			},
+			out: &Dataset{
+				Name: "users.count",
+				Fields: []Field{
+					{
+						Name: "count",
+						Type: "datetime",
+					},
+				},
+				SchemaFields: map[string]Field{
+					"count": Field{
+						Name: "count",
+						Type: "datetime",
+					},
+				},
+			},
+			err: "Following unique by blah for dataset users.count has no matching field",
+		},
+		{
+			// Unique by converted correctly to match generated field keys
+			in: &Dataset{
+				Name: "users.count",
+				Fields: []Field{
+					{
+						Name: "App name",
+						Type: "string",
+					},
+					{
+						Name: "Count All",
+						Type: "number",
+					},
+				},
+				UniqueBy: []string{"App name", "Count All"},
+			},
+			out: &Dataset{
+				Name: "users.count",
+				Fields: []Field{
+					{
+						Name: "App name",
+						Type: "string",
+					},
+					{
+						Name: "Count All",
+						Type: "number",
+					},
+				},
+				UniqueBy: []string{"App name", "Count All"},
+				SchemaFields: map[string]Field{
+					"app_name": Field{
+						Name: "App name",
+						Type: "datetime",
+					},
+					"count_all": Field{
+						Name: "Count All",
+						Type: "datetime",
+					},
+				},
+			},
+		},
+	}
+
+	for i, tc := range testCases {
+		err := tc.in.BuildSchemaFields()
+
+		if tc.err == "" && err != nil {
+			t.Errorf("[%d] Expected no error but got %s", i, err)
+		}
+
+		if tc.err != "" && err == nil {
+			t.Errorf("[%d] Expected error %s but got none", i, tc.err)
+		}
+
+		if tc.err == "" && !reflect.DeepEqual(tc.in, tc.out) {
+			t.Errorf("[%d] Expected dataset %#v but got %#v", i, tc.in, tc.out)
+		}
+	}
+}
+
 func TestDatasetValidate(t *testing.T) {
 	testCases := []struct {
 		dataset Dataset
@@ -265,6 +459,27 @@ func TestFieldKeyValue(t *testing.T) {
 				Type: MoneyType,
 			},
 			"total_cost",
+		},
+		{
+			Field{
+				Name: "Total_Cost",
+				Type: MoneyType,
+			},
+			"total_cost",
+		},
+		{
+			Field{
+				Name: "_subscribed_at",
+				Type: MoneyType,
+			},
+			"subscribed_at",
+		},
+		{
+			Field{
+				Name: "_subscribed__at_",
+				Type: MoneyType,
+			},
+			"subscribed__at",
 		},
 		{
 			Field{
