@@ -52,7 +52,10 @@ func NewClient(apiKey string) *Client {
 }
 
 func (c *Client) FindOrCreateDataset(ds *models.Dataset) error {
-	ds.BuildSchemaFields()
+	if err := ds.BuildSchemaFields(); err != nil {
+		return err
+	}
+
 	resp, err := c.makeRequest(http.MethodPut, fmt.Sprintf("/datasets/%s", ds.Name), ds)
 
 	if err != nil {
