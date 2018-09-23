@@ -66,6 +66,16 @@ func (c *Client) FindOrCreateDataset(ds *models.Dataset) error {
 	return handleResponse(resp)
 }
 
+func (c *Client) DeleteDataset(name string) (err error) {
+	resp, err := c.makeRequest(http.MethodDelete, fmt.Sprintf("/datasets/%s", name), nil)
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+	return handleResponse(resp)
+}
+
 func (c *Client) sendData(ds *models.Dataset, data models.DatasetRows) (err error) {
 	method := http.MethodPost
 

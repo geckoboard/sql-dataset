@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"database/sql"
 	"flag"
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/geckoboard/sql-dataset/drivers"
@@ -14,6 +16,7 @@ import (
 
 var (
 	configFile     = flag.String("config", "sql-dataset.yml", "Config file to load")
+	deleteDataset  = flag.String("delete-dataset", "", "Pass a dataset name you want to delete")
 	displayVersion = flag.Bool("version", false, "Displays version info")
 	version        = ""
 	gitSHA         = ""
@@ -28,7 +31,6 @@ func main() {
 	}
 
 	config, err := models.LoadConfig(*configFile)
-
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -45,6 +47,15 @@ func main() {
 		}
 
 		os.Exit(1)
+	}
+
+	if *deleteDataset != "" {
+		if err := deleteDatasetSwitch(*deleteDataset, config); err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		os.Exit(0)
 	}
 
 	// Build the connection string
@@ -127,4 +138,31 @@ func newDBConnection(driver, url string) (*sql.DB, error) {
 	pool.SetMaxOpenConns(5)
 
 	return pool, err
+}
+
+func deleteDatasetSwitch(name string, config *models.Config) error {
+	fmt.Printf("Delete dataset %q (y/N): ", name)
+
+	v, err := bufio.NewReader(os.Stdin).ReadString('\n')
+	if err != nil {
+		return err
+	}
+
+	// Remove newline and carriage return for windows
+	v = strings.TrimRight(v, "\n")
+	v = strings.TrimRight(v, "\r")
+
+	switch strings.ToLower(v) {
+	case "y":
+		client := NewClient(config.GeckoboardAPIKey)
+		if err := client.DeleteDataset(*deleteDataset); err != nil {
+			return err
+		}
+
+		fmt.Println("Dataset deleted successfully")
+	default:
+		fmt.Println("Cancelled action")
+	}
+
+	return nil
 }
