@@ -1,7 +1,7 @@
 {
 	"ImportPath": "github.com/geckoboard/sql-dataset",
 	"GoVersion": "go1.8",
-	"GodepVersion": "v79",
+	"GodepVersion": "v80",
 	"Deps": [
 		{
 			"ImportPath": "github.com/denisenkom/go-mssqldb",
@@ -9,8 +9,8 @@
 		},
 		{
 			"ImportPath": "github.com/go-sql-driver/mysql",
-			"Comment": "v1.3-14-gae5a66d",
-			"Rev": "ae5a66df4d33ba404d639bd0fc9189cd5ee79bcf"
+			"Comment": "v1.4.0-6-g361f66e",
+			"Rev": "361f66ef3b53de1f16b7f2af9ef38a6c159ceb3e"
 		},
 		{
 			"ImportPath": "github.com/lib/pq",
