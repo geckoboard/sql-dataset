@@ -235,6 +235,103 @@ func TestFindOrCreateDataset(t *testing.T) {
 	}
 }
 
+func TestDeleteDataset(t *testing.T) {
+	userAgent = "SQL-Dataset/test-fake"
+
+	testCases := []struct {
+		name     string
+		request  request
+		response *response
+		err      string
+	}{
+		{
+			// Dataset not existing response
+			name: "active.users.count",
+			request: request{
+				Path: "/datasets/active.users.count",
+			},
+			response: &response{
+				code: 404,
+				body: `{"error":{"message":"Dataset not found"}}`,
+			},
+			err: fmt.Sprintf(errInvalidPayload, "Dataset not found"),
+		},
+		{
+			// Verify bad response
+			name: "active.users.count",
+			request: request{
+				Path: "/datasets/active.users.count",
+			},
+			response: &response{
+				code: 500,
+				body: "<html>Internal error</html>",
+			},
+			err: errUnexpectedResponse.Error(),
+		},
+		{
+			// Verify 200 response correctly handled
+			name: "active.users.count",
+			request: request{
+				Path: "/datasets/active.users.count",
+			},
+			response: &response{
+				code: 200,
+				body: `{}`,
+			},
+		},
+	}
+
+	for _, tc := range testCases {
+		reqCount := 0
+
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			reqCount++
+
+			auth := r.Header.Get("Authorization")
+			if auth != expAuth {
+				t.Errorf("Expected authorization header '%s' but got '%s'", expAuth, auth)
+			}
+
+			ua := r.Header.Get("User-Agent")
+			if ua != userAgent {
+				t.Errorf("Expected user header '%s' but got '%s'", userAgent, ua)
+			}
+
+			if r.URL.Path != tc.request.Path {
+				t.Errorf("Expected path '%s' but got '%s'", tc.request.Path, r.URL.Path)
+			}
+
+			if r.Method != http.MethodDelete {
+				t.Errorf("Expected method '%s' but got '%s'", http.MethodDelete, r.Method)
+			}
+
+			if tc.response != nil {
+				w.WriteHeader(tc.response.code)
+				fmt.Fprintf(w, tc.response.body)
+				return
+			}
+		}))
+
+		gbHost = server.URL
+
+		c := NewClient(apiKey)
+		err := c.DeleteDataset(tc.name)
+
+		switch {
+		case err == nil && tc.err != "":
+			t.Errorf("Expected error %q but got none", tc.err)
+		case err != nil && (tc.err == "" || tc.err != err.Error()):
+			t.Errorf("Expected error '%s' but got '%s'", tc.err, err)
+		}
+
+		if reqCount != 1 {
+			t.Errorf("Expected one request but got %d", reqCount)
+		}
+
+		server.Close()
+	}
+}
+
 // Preset the dataset rows and test we batch correctly return errors on status codes
 func TestSendAllData(t *testing.T) {
 	testCases := []struct {
