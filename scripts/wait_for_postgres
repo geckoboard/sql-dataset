@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Taken from https://starkandwayne.com/blog/how-to-know-when-your-postgres-service-is-ready/
+
+PG_URI="postgres://postgres:$2@localhost:$1/shield"
+ATTEMPTS=0
+
+# make sure pg is ready to accept connections
+until pg_isready -h localhost -p $1 -U postgres > /dev/null
+do
+  COUNTER=$((COUNTER + 1))
+  echo "Waiting for postgres at: $PG_URI"
+  
+  if [[ "$COUNTER" == 10 ]]; then
+    echo "PostgresDB still not responding after 10 attempts... Stopping"
+    exit 1
+  fi
+  sleep 1;
+done

@@ -24,9 +24,13 @@ pull-docker-images:
 
 run-containers:
 	docker rm -f sd-mysql sd-postgres sd-mssql || true
-	docker run --name sd-mysql -e MYSQL_ROOT_PASSWORD=${PASSWORD} -p 3307:3306 -d ${DOCKER_MYSQL} || true
-	docker run --name sd-postgres -e POSTGRES_PASSWORD=${PASSWORD} -p 5433:5432 -d ${DOCKER_POSTGRES} || true
 	docker run --name sd-mssql -e ACCEPT_EULA=Y -e SA_PASSWORD=${MSPASS} -p 1433:1433 -d ${DOCKER_MSSQL} || true
+	# MySQL
+	docker run --name sd-mysql -e MYSQL_ROOT_PASSWORD=${PASSWORD} -p 3307:3306 -d ${DOCKER_MYSQL} || true
+	scripts/wait_for_mysql sd-mysql
+	# Postgres
+	docker run --name sd-postgres -e POSTGRES_PASSWORD=${PASSWORD} -p 5433:5432 -d ${DOCKER_POSTGRES} || true
+	scripts/wait_for_postgres 5433 ${PASSWORD}
 
 setup-db:
 	# Mysql ensure root can access from anywhere
@@ -42,4 +46,4 @@ test:
 	MYSQL_URL="root:${PASSWORD}@tcp(localhost:3307)/testdb?parseTime=true" \
 	POSTGRES_URL=postgres://postgres:${PASSWORD}@localhost:5433/testdb?sslmode=disable \
 	MSSQL_URL="odbc:server=localhost;port=1433;user id=sa;password=${MSPASS};database=${DB_NAME}" \
-	go test ./... -v | grep -v 'vendor'
+	go test ./... -v

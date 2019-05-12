@@ -1,0 +1,16 @@
+#!/bin/bash
+
+ATTEMPTS=0
+
+until docker exec -it $1 mysql -uroot -proot -e "show databases;" -P 3306 > /dev/null 2>&1;
+do
+  COUNTER=$((COUNTER + 1))
+  echo "Waiting for mysql in docker container"
+
+  if [[ "$COUNTER" == 20 ]]; then
+    echo "MySQL still not responding after 20 attempts... Stopping"
+    exit 1
+  fi
+
+  sleep 1;
+done
