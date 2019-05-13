@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build:
+  test:
     machine: true
     working_directory: /home/circleci/go/src/github.com/geckoboard/sql-dataset
     environment:
@@ -28,3 +28,23 @@ jobs:
       - run: make pull-docker-images run-containers
       - run: make setup-db
       - run: make test
+  build:
+    machine: true
+    working_directory: /home/circleci/go/src/github.com/geckoboard/sql-dataset
+    environment:
+      GOPATH: "/home/circleci/go"
+    steps:
+      - run: echo 'export PATH=$GOPATH/bin:$PATH' >> $BASH_ENV
+      - checkout
+      - run: make build
+      - store_artifacts:
+          path: builds
+workflows:
+  version: 2
+  test_and_build:
+    jobs:
+      - test
+      - build:
+          filters:
+            branches:
+              only: master
