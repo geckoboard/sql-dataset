@@ -42,8 +42,30 @@ setup-db:
 	# MSSQL db creation
 	docker exec -it sd-mssql /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${MSPASS} -Q "CREATE DATABASE testdb" || true
 
+
+#
+# Running the more full integration tests requires docker containers to be
+# running database servers. The setup target helps with call the other targets
+# which download docker images, run-containers and setup-db
+#
+setup: pull-docker-images run-containers setup-db
+
+#
+# Once you run setup target the docker containers will continously
+# run the tests should handle different states already with SQL fixtures
+# using REPLACE for example instead of INSERT, but eventually you will want
+# to stop the containers running this target supports that
+#
+teardown:
+	@docker stop sd-mysql > /dev/null 2>&1 || true
+	@docker rm -v sd-mysql > /dev/null 2>&1 || true
+	@docker stop sd-mssql > /dev/null 2>&1 || true
+	@docker rm -v sd-mssql > /dev/null 2>&1 || true
+	@docker stop sd-postgres > /dev/null 2>&1 || true
+	@docker rm -v sd-postgres > /dev/null 2>&1 || true
+
 test:
 	MYSQL_URL="root:${PASSWORD}@tcp(localhost:3307)/testdb?parseTime=true" \
 	POSTGRES_URL=postgres://postgres:${PASSWORD}@localhost:5433/testdb?sslmode=disable \
 	MSSQL_URL="odbc:server=localhost;port=1433;user id=sa;password=${MSPASS};database=${DB_NAME}" \
-	go test ./... -v
+	./code_coverage.sh

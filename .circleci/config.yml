@@ -27,7 +27,11 @@ jobs:
       - checkout
       - run: make pull-docker-images run-containers
       - run: make setup-db
-      - run: make test
+      - run:
+          name: "Run tests and upload coverage report"
+          command: |
+            make test
+            bash <(curl -s https://codecov.io/bash)
   build:
     machine: true
     working_directory: /home/circleci/go/src/github.com/geckoboard/sql-dataset
