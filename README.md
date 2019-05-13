@@ -1,6 +1,6 @@
 # SQL-Dataset, by Geckoboard
 
-[![CircleCI](https://circleci.com/gh/geckoboard/sql-dataset.svg?style=svg)](https://circleci.com/gh/geckoboard/sql-dataset)
+[![CircleCI](https://circleci.com/gh/geckoboard/sql-dataset.svg?style=svg)](https://circleci.com/gh/geckoboard/sql-dataset)  [![codecov](https://codecov.io/gh/geckoboard/sql-dataset/branch/master/graph/badge.svg)](https://codecov.io/gh/geckoboard/sql-dataset)
 
 Quickly and easily send data from Microsoft SQL Server, MySQL, Postgres and SQLite databases to Geckoboard Datasets.
 
