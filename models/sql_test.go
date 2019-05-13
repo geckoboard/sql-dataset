@@ -517,7 +517,7 @@ func TestBuildDatasetPostgresDriver(t *testing.T) {
 				},
 			},
 			out: nil,
-			err: fmt.Sprintf(errFailedSQLQuery, "dial tcp 127.0.0.1:9999: getsockopt: connection refused"),
+			err: fmt.Sprintf(errFailedSQLQuery, "dial tcp 127.0.0.1:9999: connect: connection refused"),
 		},
 		{
 			config: Config{
@@ -973,7 +973,7 @@ func TestBuildDatasetMySQLDriver(t *testing.T) {
 				},
 			},
 			out: nil,
-			err: fmt.Sprintf(errFailedSQLQuery, "dial tcp 127.0.0.1:9999: getsockopt: connection refused"),
+			err: fmt.Sprintf(errFailedSQLQuery, "dial tcp 127.0.0.1:9999: connect: connection refused"),
 		},
 		{
 			config: Config{

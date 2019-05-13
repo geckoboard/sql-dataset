@@ -1,5 +1,7 @@
 # SQL-Dataset, by Geckoboard
 
+[![CircleCI](https://circleci.com/gh/geckoboard/sql-dataset.svg?style=svg)](https://circleci.com/gh/geckoboard/sql-dataset)  [![codecov](https://codecov.io/gh/geckoboard/sql-dataset/branch/master/graph/badge.svg)](https://codecov.io/gh/geckoboard/sql-dataset)
+
 Quickly and easily send data from Microsoft SQL Server, MySQL, Postgres and SQLite databases to Geckoboard Datasets.
 
 SQL-Dataset is a command line app that takes the hassle out of integrating your database with Geckoboard. Rather than having to work with client libraries and write a bunch of code to connect to and query your database, with SQL-Dataset all you need to do is fill out a simple config file.

@@ -1,0 +1,54 @@
+version: 2
+jobs:
+  test:
+    machine: true
+    working_directory: /home/circleci/go/src/github.com/geckoboard/sql-dataset
+    environment:
+      GOPATH: "/home/circleci/go"
+    steps:
+      - run: echo 'export PATH=$GOPATH/bin:$PATH' >> $BASH_ENV
+      - run:
+          name: "Install mysql client"
+          command: sudo apt install mysql-client
+      - run:
+          name: "Install postgres client tools"
+          command: |
+            # The machine executor image is old 14.04 and only supplies 9.3 we need 9.4+ for the postgres pg_isready util
+            sudo add-apt-repository "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -sc)-pgdg main"
+            wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+            sudo apt-get update
+            sudo apt install postgresql-client-9.6
+      - run:
+          name: "Upgrade go to 1.10"
+          command: |
+            cd $HOME
+            curl https://dl.google.com/go/go1.10.8.linux-amd64.tar.gz -o golang.tar.gz
+            sudo tar -C /usr/local -xzf golang.tar.gz
+      - checkout
+      - run: make pull-docker-images run-containers
+      - run: make setup-db
+      - run:
+          name: "Run tests and upload coverage report"
+          command: |
+            make test
+            bash <(curl -s https://codecov.io/bash)
+  build:
+    machine: true
+    working_directory: /home/circleci/go/src/github.com/geckoboard/sql-dataset
+    environment:
+      GOPATH: "/home/circleci/go"
+    steps:
+      - run: echo 'export PATH=$GOPATH/bin:$PATH' >> $BASH_ENV
+      - checkout
+      - run: make build
+      - store_artifacts:
+          path: builds
+workflows:
+  version: 2
+  test_and_build:
+    jobs:
+      - test
+      - build:
+          filters:
+            branches:
+              only: master
