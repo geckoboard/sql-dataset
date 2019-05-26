@@ -3,7 +3,7 @@ package drivers
 import (
 	"bytes"
 	"fmt"
-	"net"
+	"strings"
 
 	"github.com/geckoboard/sql-dataset/models"
 )
@@ -12,7 +12,6 @@ type postgres struct{}
 
 const (
 	postgresPort = "5432"
-	connPrefix   = "postgres://"
 )
 
 /*
@@ -41,19 +40,18 @@ func (p postgres) Build(dc *models.DatabaseConfig) (string, error) {
 
 	keys := orderKeys(dc.Params)
 	for _, k := range keys {
-		buildParams(&buf, fmt.Sprintf("%s=%s", k, dc.Params[k]))
+		buf.WriteString(fmt.Sprintf(" %s=%s", k, p.Encode(dc.Params[k])))
 	}
 
-	var paramSplit string
+	var params string
 	if buf.Len() > 0 {
-		paramSplit = "?"
+		params = buf.String()
 	}
 
-	return fmt.Sprintf("%s%s%s%s",
-		connPrefix,
+	return fmt.Sprintf("dbname=%s %s%s",
+		dc.Database,
 		p.buildConnString(dc),
-		paramSplit,
-		buf.String(),
+		params,
 	), nil
 }
 
@@ -85,18 +83,18 @@ func (p postgres) buildConnString(dc *models.DatabaseConfig) string {
 	var auth, netHost string
 
 	if dc.Password == "" {
-		auth = dc.Username
+		auth = "user=" + dc.Username
 	} else {
-		auth = fmt.Sprintf("%s:%s", dc.Username, dc.Password)
+		auth = fmt.Sprintf("user=%s password=%s", p.Encode(dc.Username), p.Encode(dc.Password))
 	}
 
 	if dc.Protocol == tcpConn {
-		netHost = net.JoinHostPort(dc.Host, dc.Port)
+		netHost = fmt.Sprintf("host=%s port=%s", dc.Host, dc.Port)
 	} else {
-		netHost = dc.Host
+		netHost = fmt.Sprintf("host=%s", dc.Host)
 	}
 
-	return fmt.Sprintf("%s@%s/%s", auth, netHost, dc.Database)
+	return auth + " " + netHost
 }
 
 func (p postgres) setDefaults(dc *models.DatabaseConfig) {
@@ -115,4 +113,31 @@ func (p postgres) setDefaults(dc *models.DatabaseConfig) {
 	if dc.Port == "" && dc.Protocol == tcpConn {
 		dc.Port = postgresPort
 	}
+}
+
+func (p postgres) Encode(s string) string {
+	var changed bool
+	new := s
+
+	if strings.Contains(s, `\`) {
+		new = strings.Replace(new, `\`, `\\`, -1)
+		changed = true
+	}
+
+	if strings.Contains(s, " ") {
+		new = strings.Replace(new, " ", `\ `, -1)
+		changed = true
+	}
+
+	if strings.Contains(s, "'") {
+		new = strings.Replace(new, "'", `\'`, -1)
+		changed = true
+	}
+
+	if changed {
+		return fmt.Sprintf("'%s'", new)
+	}
+
+	return s
+
 }
