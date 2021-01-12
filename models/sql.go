@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"time"
 
-	"gopkg.in/guregu/null.v3"
-
+	_ "github.com/ClickHouse/clickhouse-go"
 	_ "github.com/denisenkom/go-mssqldb"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
+	"gopkg.in/guregu/null.v3"
 )
 
 const dateFormat = "2006-01-02"
@@ -64,7 +64,7 @@ func (ds Dataset) BuildDataset(dc *DatabaseConfig, db *sql.DB) (DatasetRows, err
 	return datasetRecs, nil
 }
 
-func (ds Dataset) queryDatasource(dc *DatabaseConfig, db *sql.DB) (records []interface{}, err error) {
+func (ds Dataset) queryDatasource(_ *DatabaseConfig, db *sql.DB) (records []interface{}, err error) {
 	rows, err := db.Query(ds.SQL)
 
 	if err != nil {

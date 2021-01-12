@@ -84,6 +84,7 @@ Hopefully this is obvious, but this is where your Geckoboard API key goes. You c
 
 Enter the type of database you're connecting to in the `driver` field. SQL-Dataset supports:
 
+- `clickhouse`
 - `mssql`
 - `mysql`
 - `postgres`

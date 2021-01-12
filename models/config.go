@@ -11,14 +11,15 @@ import (
 )
 
 const (
-	MySQLDriver    = "mysql"
-	PostgresDriver = "postgres"
-	SQLiteDriver   = "sqlite3"
-	MSSQLDriver    = "mssql"
+	ClickHouseDriver = "clickhouse"
+	MSSQLDriver      = "mssql"
+	MySQLDriver      = "mysql"
+	PostgresDriver   = "postgres"
+	SQLiteDriver     = "sqlite3"
 )
 
 var (
-	SupportedDrivers = []string{MSSQLDriver, MySQLDriver, PostgresDriver, SQLiteDriver}
+	SupportedDrivers = []string{ClickHouseDriver, MSSQLDriver, MySQLDriver, PostgresDriver, SQLiteDriver}
 	interpolateRegex = regexp.MustCompile(`{{\s*([a-zA-Z0-9_]+)\s*}}`)
 )
 
