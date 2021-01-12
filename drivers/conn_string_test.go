@@ -15,6 +15,82 @@ func TestNewConnStringBuilder(t *testing.T) {
 		err         string
 		isDriverErr bool
 	}{
+		// ClickHouse Driver
+		{
+			in: models.DatabaseConfig{
+				Driver: models.ClickHouseDriver,
+			},
+			err: errHostnameRequired.Error(),
+		},
+		{
+			in: models.DatabaseConfig{
+				Driver: models.ClickHouseDriver,
+				Host:   "localhost",
+			},
+			out: "tcp://localhost:9000",
+		},
+		{
+			in: models.DatabaseConfig{
+				Driver: models.ClickHouseDriver,
+				Host:   "localhost",
+				Port:   "1234",
+			},
+			out: "tcp://localhost:1234",
+		},
+		{
+			in: models.DatabaseConfig{
+				Driver:   models.ClickHouseDriver,
+				Host:     "localhost",
+				Username: "User",
+			},
+			out: "tcp://localhost:9000?username=User",
+		},
+		{
+			in: models.DatabaseConfig{
+				Driver:   models.ClickHouseDriver,
+				Host:     "localhost",
+				Username: "User",
+				Password: "secret123",
+			},
+			out: "tcp://localhost:9000?password=secret123&username=User",
+		},
+		{
+			in: models.DatabaseConfig{
+				Driver:   models.ClickHouseDriver,
+				Host:     "localhost",
+				Password: "secret123", // password without username is useless
+			},
+			out: "tcp://localhost:9000",
+		},
+		{
+			in: models.DatabaseConfig{
+				Driver:   models.ClickHouseDriver,
+				Host:     "localhost",
+				Username: "User",
+				Password: "secret123",
+				Database: "my_database",
+			},
+			out: "tcp://localhost:9000?database=my_database&password=secret123&username=User",
+		},
+		{
+			in: models.DatabaseConfig{
+				Driver:   models.ClickHouseDriver,
+				Host:     "localhost",
+				Database: "test_database",
+			},
+			out: "tcp://localhost:9000?database=test_database",
+		},
+		{
+			in: models.DatabaseConfig{
+				Driver:   models.ClickHouseDriver,
+				Host:     "localhost",
+				Database: "test_database",
+				TLSConfig: &models.TLSConfig{
+					CAFile: filepath.Join("..", "models", "fixtures", "ca.cert.pem"),
+				},
+			},
+			out: "tcp://localhost:9000?database=test_database&secure=true&tls_config=clickhouseCert",
+		},
 		//SQLite Driver
 		{
 			in: models.DatabaseConfig{
@@ -164,7 +240,7 @@ func TestNewConnStringBuilder(t *testing.T) {
 					CAFile: filepath.Join("..", "models", "fixtures", "ca.key.pem"),
 				},
 			},
-			err: "SSL error: Failed to append PEM. Please check that it's a valid CA certificate.",
+			err: errAppendPEMFailed.Error(),
 		},
 		{
 			// ssl only
@@ -451,13 +527,13 @@ func TestNewConnStringBuilder(t *testing.T) {
 			},
 			err: "Cert file not supported, only ca_file is for MSSQL Driver",
 		},
-		// None existing driver
+		// Non-existing driver
 		// This really should never happen because of config validation
 		{
 			in: models.DatabaseConfig{
 				Driver: "PearDB",
 			},
-			err:         "PearDB is not supported driver. SQL-Dataset supports [mssql mysql postgres sqlite3]",
+			err:         "PearDB is not supported driver. SQL-Dataset supports [clickhouse mssql mysql postgres sqlite3]",
 			isDriverErr: true,
 		},
 	}
@@ -467,7 +543,7 @@ func TestNewConnStringBuilder(t *testing.T) {
 		if err != nil {
 			if tc.isDriverErr {
 				if tc.err != err.Error() {
-					t.Errorf("Expected driver error %s but got %s", tc.err, err)
+					t.Errorf("Expected driver error %q but got %q", tc.err, err)
 				}
 			} else {
 				t.Error(err)
@@ -476,7 +552,7 @@ func TestNewConnStringBuilder(t *testing.T) {
 			continue
 		}
 
-		if tc.isDriverErr && err == nil {
+		if tc.isDriverErr {
 			t.Errorf("Expected driver error %s but got none", tc.err)
 		}
 

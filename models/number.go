@@ -7,12 +7,14 @@ import (
 
 const (
 	intType     = "int"
+	uintType    = "uint"
 	float32Type = "float32"
 	float64Type = "float64"
 )
 
 type Number struct {
 	Int64   int64
+	UInt64  uint64
 	Float32 float32
 	Float64 float64
 
@@ -23,6 +25,8 @@ func (n *Number) Value(optional bool) interface{} {
 	switch n.Type {
 	case intType:
 		return n.Int64
+	case uintType:
+		return n.UInt64
 	case float32Type:
 		return n.Float32
 	case float64Type:
@@ -37,22 +41,48 @@ func (n *Number) Value(optional bool) interface{} {
 }
 
 func (n *Number) Scan(value interface{}) error {
-	switch value.(type) {
-	case string:
-		return fmt.Errorf("can't convert string %#v to number", value.(string))
+	switch val := value.(type) {
+	default:
+		return fmt.Errorf("can't convert type %T to number", value)
 	case float64:
 		n.Type = float64Type
-		n.Float64 = value.(float64)
+		n.Float64 = val
 	case float32:
 		n.Type = float32Type
-		n.Float32 = value.(float32)
-	case int, int32, int64:
+		n.Float32 = val
+	case int:
 		n.Type = intType
-		n.Int64 = value.(int64)
+		n.Int64 = int64(val)
+	case int8:
+		n.Type = intType
+		n.Int64 = int64(val)
+	case int16:
+		n.Type = intType
+		n.Int64 = int64(val)
+	case int32:
+		n.Type = intType
+		n.Int64 = int64(val)
+	case int64:
+		n.Type = intType
+		n.Int64 = val
+	case uint:
+		n.Type = uintType
+		n.UInt64 = uint64(val)
+	case uint8:
+		n.Type = uintType
+		n.UInt64 = uint64(val)
+	case uint16:
+		n.Type = uintType
+		n.UInt64 = uint64(val)
+	case uint32:
+		n.Type = uintType
+		n.UInt64 = uint64(val)
+	case uint64:
+		n.Type = uintType
+		n.UInt64 = val
 	case []byte:
 		return n.pruneBytes(value.([]byte))
 	}
-
 	return nil
 }
 

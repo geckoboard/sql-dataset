@@ -15,8 +15,10 @@ const (
 )
 
 var (
+	errHostnameRequired = errors.New("No hostname provided.")
 	errDatabaseRequired = errors.New("No database provided.")
 	errUsernameRequired = errors.New("No username provided.")
+	errAppendPEMFailed  = errors.New("SSL error: Failed to append PEM. Please check that it's a valid CA certificate.")
 )
 
 type ConnStringBuilder interface {
@@ -25,6 +27,8 @@ type ConnStringBuilder interface {
 
 func NewConnStringBuilder(driver string) (ConnStringBuilder, error) {
 	switch driver {
+	case models.ClickHouseDriver:
+		return clickhouse{}, nil
 	case models.PostgresDriver:
 		return postgres{}, nil
 	case models.MySQLDriver:

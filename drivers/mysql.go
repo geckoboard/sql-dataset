@@ -72,8 +72,7 @@ func (m mysql) loadCerts(keyFile, certFile, caFile string) (*x509.CertPool, []tl
 		}
 
 		if ok := rootCertPool.AppendCertsFromPEM(pem); !ok {
-			return nil, nil, fmt.Errorf("SSL error: Failed to append PEM. " +
-				"Please check that it's a valid CA certificate.")
+			return nil, nil, errAppendPEMFailed
 		}
 	}
 
