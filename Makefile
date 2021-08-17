@@ -9,13 +9,21 @@ DOCKER_POSTGRES=postgres:9.6
 DOCKER_MSSQL=mcr.microsoft.com/mssql/server:2017-latest
 DB_NAME=testdb
 
-build:
-	mkdir -p $(BUILD_DIR) 
-	docker pull karalabe/xgo-latest
-	go get github.com/karalabe/xgo
-	xgo -dest=$(BUILD_DIR) \
-	-ldflags="-X main.version=$(VERSION) -X main.gitSHA=$(GIT_SHA)" \
-	-targets="darwin-10.10/* windows-8.0/amd64 windows-8.0/386 linux/amd64 linux/386" .
+BUILD_PREFIX=builds/sql-dataset
+LDFLAGS="-X main.version=$(VERSION) -X main.gitSHA=$(GIT_SHA)"
+
+build-darwin:
+	rm builds/* || true
+	CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -o ${BUILD_PREFIX}-darwin-amd64 -ldflags=${LDFLAGS}
+	CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build -o ${BUILD_PREFIX}-darwin-arm64 -ldflags=${LDFLAGS}
+	
+build-unix:
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -o ${BUILD_PREFIX}-linux-amd64 -ldflags=${LDFLAGS}
+	CGO_ENABLED=1 GOOS=linux GOARCH=386 go build -o ${BUILD_PREFIX}-linux-386 -ldflags=${LDFLAGS}
+
+build-win:
+	set GOARCH=amd64; go build -o ${BUILD_PREFIX}-windows-10.0-amd64.exe -ldflags=${LDFLAGS}
+	set GOARCH=386; go build -o ${BUILD_PREFIX}-windows-10.0-386.exe -ldflags=${LDFLAGS}
 
 pull-docker-images:
 	docker pull ${DOCKER_MYSQL}

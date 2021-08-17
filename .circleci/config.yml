@@ -36,20 +36,8 @@ jobs:
       - run: make setup-db
       - run: make test
       - codecov/upload
-  build:
-    executor: ubuntu
-    steps:
-      - install_go
-      - checkout
-      - run: make build
-      - store_artifacts:
-          path: builds
 workflows:
   version: 2
-  test_and_build:
+  test_build:
     jobs:
       - test
-      - build:
-          filters:
-            branches:
-              only: master
