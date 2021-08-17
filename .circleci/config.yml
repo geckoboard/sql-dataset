@@ -1,5 +1,12 @@
 version: 2.1
 
+machine: &machine_setup
+  machine:
+    image: ubuntu-2004:202010-01
+  working_directory: /home/circleci/go/src/github.com/geckoboard/sql-dataset
+  environment:
+    GOPATH: "/home/circleci/go"
+
 commands:
   install_go:
     description: "Exports go bin path and installs specific go version"
@@ -17,10 +24,7 @@ commands:
 
 jobs:
   test:
-    machine: true
-    working_directory: /home/circleci/go/src/github.com/geckoboard/sql-dataset
-    environment:
-      GOPATH: "/home/circleci/go"
+    <<: *machine_setup
     steps:
       - install_go
       - checkout
@@ -32,10 +36,7 @@ jobs:
             make test
             bash <(curl -s https://codecov.io/bash)
   build:
-    machine: true
-    working_directory: /home/circleci/go/src/github.com/geckoboard/sql-dataset
-    environment:
-      GOPATH: "/home/circleci/go"
+    <<: *machine_setup
     steps:
       - install_go
       - checkout
