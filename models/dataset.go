@@ -19,6 +19,7 @@ const (
 	MoneyType      FieldType = "money"
 	PercentageType FieldType = "percentage"
 	StringType     FieldType = "string"
+	DurationType   FieldType = "duration"
 )
 
 var (
@@ -33,6 +34,7 @@ var fieldTypes = []FieldType{
 	MoneyType,
 	PercentageType,
 	StringType,
+	DurationType,
 }
 
 type Dataset struct {
@@ -49,6 +51,7 @@ type Field struct {
 	Key          string    `json:"-"                        yaml:"key"`
 	Name         string    `json:"name"                     yaml:"name"`
 	CurrencyCode string    `json:"currency_code,omitempty"  yaml:"currency_code"`
+	TimeUnit     string    `json:"time_unit,omitempty"      yaml:"time_unit"`
 	Optional     bool      `json:"optional,omitempty"       yaml:"optional,omitempty"`
 }
 
@@ -187,6 +190,10 @@ func (f Field) Validate() (errors []string) {
 
 	if f.Type == MoneyType && f.CurrencyCode == "" {
 		errors = append(errors, errMissingCurrency)
+	}
+
+	if f.Type == DurationType && f.TimeUnit == "" {
+		errors = append(errors, errMissingTimeUnit)
 	}
 
 	return errors

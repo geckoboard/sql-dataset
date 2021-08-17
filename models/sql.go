@@ -37,7 +37,7 @@ func (ds Dataset) BuildDataset(dc *DatabaseConfig, db *sql.DB) (DatasetRows, err
 			k := f.KeyValue()
 
 			switch f.Type {
-			case NumberType, MoneyType, PercentageType:
+			case NumberType, MoneyType, PercentageType, DurationType:
 				data[k] = col.(*Number).Value(f.Optional)
 			case StringType:
 				data[k] = col.(*null.String).String
@@ -97,7 +97,7 @@ func (ds Dataset) queryDatasource(dc *DatabaseConfig, db *sql.DB) (records []int
 
 func (f Field) fieldTypeMapping() interface{} {
 	switch f.Type {
-	case NumberType, MoneyType, PercentageType:
+	case NumberType, MoneyType, PercentageType, DurationType:
 		var x Number
 		return &x
 	case StringType:

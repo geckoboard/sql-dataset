@@ -469,6 +469,24 @@ func TestDatasetValidate(t *testing.T) {
 				Name:       "app.build.cost",
 				UpdateType: Replace,
 				SQL:        "SELECT * FROM some_funky_table;",
+				Fields:     []Field{{Name: "duration", Type: DurationType}},
+			},
+			[]string{errMissingTimeUnit},
+		},
+		{
+			Dataset{
+				Name:       "app.build.cost",
+				UpdateType: Replace,
+				SQL:        "SELECT * FROM some_funky_table;",
+				Fields:     []Field{{Name: "duration", Type: DurationType, TimeUnit: "milliseconds"}},
+			},
+			nil,
+		},
+		{
+			Dataset{
+				Name:       "app.build.cost",
+				UpdateType: Replace,
+				SQL:        "SELECT * FROM some_funky_table;",
 				Fields:     []Field{{Name: "count", Type: MoneyType, CurrencyCode: "USD"}},
 			},
 			nil,

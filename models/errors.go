@@ -39,6 +39,9 @@ const (
 	errMissingCurrency = "No currency_code provided for the money field %s. " +
 		"Please provide an ISO4217 currency code."
 
+	errMissingTimeUnit = "No time_unit provided for the duration field %s. " +
+		"Please provide one of milliseconds, seconds, minutes or hours"
+
 	errDuplicateFieldNames = `The field names "%s" will create duplicate keys. ` +
 		`Please revise using a unique combination of letters and numbers.`
 )

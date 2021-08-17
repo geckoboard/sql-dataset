@@ -74,6 +74,35 @@ func TestEndToEndFlow(t *testing.T) {
 			},
 		},
 		{
+			config: models.Config{
+				DatabaseConfig: &models.DatabaseConfig{
+					Driver: models.SQLiteDriver,
+					URL:    filepath.Join("models", "fixtures", "db.sqlite"),
+				},
+				Datasets: []models.Dataset{
+					{
+						Name:       "app.durations",
+						SQL:        "SELECT app_name, run_time FROM builds ORDER BY app_name",
+						UpdateType: models.Append,
+						Fields: []models.Field{
+							{Name: "App", Type: models.StringType},
+							{Name: "Build runtime", Type: models.DurationType, TimeUnit: "minutes"},
+						},
+					},
+				},
+			},
+			gbReqs: []GBRequest{
+				{
+					Path: "/datasets/app.durations",
+					Body: `{"id":"app.durations","fields":{"app":{"type":"string","name":"App"},"build_runtime":{"type":"duration","name":"Build runtime","time_unit":"minutes"}}}`,
+				},
+				{
+					Path: "/datasets/app.durations/data",
+					Body: `{"data":[{"app":"","build_runtime":0.12349876543},{"app":"","build_runtime":46.432763287},{"app":"everdeen","build_runtime":0.31882276212},{"app":"everdeen","build_runtime":144.31838122382},{"app":"geckoboard-ruby","build_runtime":0.21882232124},{"app":"geckoboard-ruby","build_runtime":77.21381276421},{"app":"geckoboard-ruby","build_runtime":0},{"app":"react","build_runtime":118.18382961212},{"app":"westworld","build_runtime":321.93774373}]}`,
+				},
+			},
+		},
+		{
 			// Replace update type sends the first batch only
 			config: models.Config{
 				DatabaseConfig: &models.DatabaseConfig{
