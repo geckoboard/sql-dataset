@@ -6,7 +6,7 @@ MSPASS=zebra-IT-32
 
 DOCKER_MYSQL=mysql/mysql-server:5.7
 DOCKER_POSTGRES=postgres:9.6
-DOCKER_MSSQL=microsoft/mssql-server-linux
+DOCKER_MSSQL=mcr.microsoft.com/mssql/server:2017-latest
 DB_NAME=testdb
 
 build:
