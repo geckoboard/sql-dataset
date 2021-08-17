@@ -37,7 +37,7 @@ func TestBuildDatasetSQLiteDriver(t *testing.T) {
 				},
 			},
 			out: nil,
-			err: fmt.Sprintf(errFailedSQLQuery, "unable to open database file"),
+			err: fmt.Sprintf(errFailedSQLQuery, "unable to open database file: no such file or directory"),
 		},
 		{
 			config: Config{
@@ -56,7 +56,7 @@ func TestBuildDatasetSQLiteDriver(t *testing.T) {
 				},
 			},
 			out: nil,
-			err: fmt.Sprintf(errParseSQLResultSet, `sql: Scan error on column index 0: strconv.ParseInt: parsing "everdeen": invalid syntax`),
+			err: fmt.Sprintf(errParseSQLResultSet, `sql: Scan error on column index 0, name "app_name": can't convert string "" to number`),
 		},
 		{
 			config: Config{
@@ -270,39 +270,39 @@ func TestBuildDatasetSQLiteDriver(t *testing.T) {
 			},
 			out: []map[string]interface{}{
 				{
-					"app": "",
+					"app":                  "",
 					"percentage_completed": 0.01,
 				},
 				{
-					"app": "",
+					"app":                  "",
 					"percentage_completed": 0.34,
 				},
 				{
-					"app": "everdeen",
+					"app":                  "everdeen",
 					"percentage_completed": 0.8,
 				},
 				{
-					"app": "everdeen",
+					"app":                  "everdeen",
 					"percentage_completed": 1.0,
 				},
 				{
-					"app": "geckoboard-ruby",
+					"app":                  "geckoboard-ruby",
 					"percentage_completed": 0,
 				},
 				{
-					"app": "geckoboard-ruby",
+					"app":                  "geckoboard-ruby",
 					"percentage_completed": 0.24,
 				},
 				{
-					"app": "geckoboard-ruby",
+					"app":                  "geckoboard-ruby",
 					"percentage_completed": 0.55,
 				},
 				{
-					"app": "react",
+					"app":                  "react",
 					"percentage_completed": 0.95,
 				},
 				{
-					"app": "westworld",
+					"app":                  "westworld",
 					"percentage_completed": 0,
 				},
 			},
@@ -536,7 +536,7 @@ func TestBuildDatasetPostgresDriver(t *testing.T) {
 				},
 			},
 			out: nil,
-			err: fmt.Sprintf(errParseSQLResultSet, `sql: Scan error on column index 0: can't convert string "" to number`),
+			err: fmt.Sprintf(errParseSQLResultSet, `sql: Scan error on column index 0, name "app_name": can't convert string "" to number`),
 		},
 		{
 			config: Config{
@@ -726,39 +726,39 @@ func TestBuildDatasetPostgresDriver(t *testing.T) {
 			},
 			out: []map[string]interface{}{
 				{
-					"app": "",
+					"app":                  "",
 					"percentage_completed": 0.01,
 				},
 				{
-					"app": "",
+					"app":                  "",
 					"percentage_completed": 0.34,
 				},
 				{
-					"app": "everdeen",
+					"app":                  "everdeen",
 					"percentage_completed": 0.8,
 				},
 				{
-					"app": "everdeen",
+					"app":                  "everdeen",
 					"percentage_completed": 1.0,
 				},
 				{
-					"app": "geckoboard-ruby",
+					"app":                  "geckoboard-ruby",
 					"percentage_completed": 0.55,
 				},
 				{
-					"app": "geckoboard-ruby",
+					"app":                  "geckoboard-ruby",
 					"percentage_completed": 0,
 				},
 				{
-					"app": "geckoboard-ruby",
+					"app":                  "geckoboard-ruby",
 					"percentage_completed": 0.24,
 				},
 				{
-					"app": "react",
+					"app":                  "react",
 					"percentage_completed": 0.95,
 				},
 				{
-					"app": "westworld",
+					"app":                  "westworld",
 					"percentage_completed": 0,
 				},
 			},
@@ -992,7 +992,7 @@ func TestBuildDatasetMySQLDriver(t *testing.T) {
 				},
 			},
 			out: nil,
-			err: fmt.Sprintf(errParseSQLResultSet, `sql: Scan error on column index 0: strconv.ParseInt: parsing "everdeen": invalid syntax`),
+			err: fmt.Sprintf(errParseSQLResultSet, `sql: Scan error on column index 0, name "app_name": strconv.ParseInt: parsing "everdeen": invalid syntax`),
 		},
 		{
 			config: Config{
@@ -1182,39 +1182,39 @@ func TestBuildDatasetMySQLDriver(t *testing.T) {
 			},
 			out: []map[string]interface{}{
 				{
-					"app": "",
+					"app":                  "",
 					"percentage_completed": 0.01,
 				},
 				{
-					"app": "",
+					"app":                  "",
 					"percentage_completed": 0.34,
 				},
 				{
-					"app": "everdeen",
+					"app":                  "everdeen",
 					"percentage_completed": 0.8,
 				},
 				{
-					"app": "everdeen",
+					"app":                  "everdeen",
 					"percentage_completed": 1.0,
 				},
 				{
-					"app": "geckoboard-ruby",
+					"app":                  "geckoboard-ruby",
 					"percentage_completed": 0,
 				},
 				{
-					"app": "geckoboard-ruby",
+					"app":                  "geckoboard-ruby",
 					"percentage_completed": 0.24,
 				},
 				{
-					"app": "geckoboard-ruby",
+					"app":                  "geckoboard-ruby",
 					"percentage_completed": 0.55,
 				},
 				{
-					"app": "react",
+					"app":                  "react",
 					"percentage_completed": 0.95,
 				},
 				{
-					"app": "westworld",
+					"app":                  "westworld",
 					"percentage_completed": 0,
 				},
 			},
@@ -1428,7 +1428,7 @@ func TestBuildDatasetMSSQLDriver(t *testing.T) {
 				},
 			},
 			out: nil,
-			err: fmt.Sprintf(errFailedSQLQuery, "Login error: mssql: Login failed for user 'userx'."),
+			err: fmt.Sprintf(errFailedSQLQuery, "login error: mssql: Login failed for user 'userx'."),
 		},
 		{
 			config: Config{
@@ -1447,7 +1447,7 @@ func TestBuildDatasetMSSQLDriver(t *testing.T) {
 				},
 			},
 			out: nil,
-			err: fmt.Sprintf(errParseSQLResultSet, `sql: Scan error on column index 0: can't convert string "" to number`),
+			err: fmt.Sprintf(errParseSQLResultSet, `sql: Scan error on column index 0, name "app_name": can't convert string "" to number`),
 		},
 		{
 			config: Config{
@@ -1637,39 +1637,39 @@ func TestBuildDatasetMSSQLDriver(t *testing.T) {
 			},
 			out: []map[string]interface{}{
 				{
-					"app": "",
+					"app":                  "",
 					"percentage_completed": 0.01,
 				},
 				{
-					"app": "",
+					"app":                  "",
 					"percentage_completed": 0.34,
 				},
 				{
-					"app": "everdeen",
+					"app":                  "everdeen",
 					"percentage_completed": 0.8,
 				},
 				{
-					"app": "everdeen",
+					"app":                  "everdeen",
 					"percentage_completed": 1.0,
 				},
 				{
-					"app": "geckoboard-ruby",
+					"app":                  "geckoboard-ruby",
 					"percentage_completed": 0,
 				},
 				{
-					"app": "geckoboard-ruby",
+					"app":                  "geckoboard-ruby",
 					"percentage_completed": 0.24,
 				},
 				{
-					"app": "geckoboard-ruby",
+					"app":                  "geckoboard-ruby",
 					"percentage_completed": 0.55,
 				},
 				{
-					"app": "react",
+					"app":                  "react",
 					"percentage_completed": 0.95,
 				},
 				{
-					"app": "westworld",
+					"app":                  "westworld",
 					"percentage_completed": 0,
 				},
 			},

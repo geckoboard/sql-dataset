@@ -46,7 +46,7 @@ func TestEndToEndFlow(t *testing.T) {
 					{
 						Name:       "app.build.costs",
 						UpdateType: models.Append,
-						SQL:        "SELECT app_name, CAST(build_cost*100 AS INTEGER) FROM builds GROUP BY app_name order by app_name",
+						SQL:        "SELECT app_name, SUM(CAST(build_cost*100 AS INTEGER)) FROM builds GROUP BY app_name order by app_name",
 						Fields: []models.Field{
 							{Name: "App", Type: models.StringType},
 							{Name: "Build Cost", Type: models.MoneyType, CurrencyCode: "USD"},
@@ -69,7 +69,7 @@ func TestEndToEndFlow(t *testing.T) {
 				},
 				{
 					Path: "/datasets/app.build.costs/data",
-					Body: `{"data":[{"app":"","build_cost":1132},{"app":"everdeen","build_cost":144},{"app":"geckoboard-ruby","build_cost":0},{"app":"react","build_cost":111},{"app":"westworld","build_cost":264}]}`,
+					Body: `{"data":[{"app":"","build_cost":1132},{"app":"everdeen","build_cost":198},{"app":"geckoboard-ruby","build_cost":116},{"app":"react","build_cost":111},{"app":"westworld","build_cost":264}]}`,
 				},
 			},
 		},

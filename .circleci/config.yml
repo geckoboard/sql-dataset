@@ -1,44 +1,45 @@
-version: 2
-jobs:
-  test:
-    machine: true
+version: 2.1
+
+orbs:
+  codecov: codecov/codecov@1.2.5
+
+executors:
+  ubuntu:
+    machine:
+      image: "ubuntu-2004:202010-01"
     working_directory: /home/circleci/go/src/github.com/geckoboard/sql-dataset
     environment:
       GOPATH: "/home/circleci/go"
+
+commands:
+  install_go:
+    description: "Exports go bin path and installs specific go version"
     steps:
       - run: echo 'export PATH=$GOPATH/bin:$PATH' >> $BASH_ENV
       - run:
-          name: "Install mysql client"
-          command: sudo apt install mysql-client
+          name: "Remove old go directory"
+          command: sudo rm -rf /usr/local/go
       - run:
-          name: "Install postgres client tools"
-          command: |
-            # The machine executor image is old 14.04 and only supplies 9.3 we need 9.4+ for the postgres pg_isready util
-            sudo add-apt-repository "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -sc)-pgdg main"
-            wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
-            sudo apt-get update
-            sudo apt install postgresql-client-9.6
-      - run:
-          name: "Upgrade go to 1.10"
+          name: "Upgrade go to 1.16"
           command: |
             cd $HOME
-            curl https://dl.google.com/go/go1.10.8.linux-amd64.tar.gz -o golang.tar.gz
+            curl https://dl.google.com/go/go1.16.7.linux-amd64.tar.gz -o golang.tar.gz
             sudo tar -C /usr/local -xzf golang.tar.gz
+
+jobs:
+  test:
+    executor: ubuntu
+    steps:
+      - install_go
       - checkout
       - run: make pull-docker-images run-containers
       - run: make setup-db
-      - run:
-          name: "Run tests and upload coverage report"
-          command: |
-            make test
-            bash <(curl -s https://codecov.io/bash)
+      - run: make test
+      - codecov/upload
   build:
-    machine: true
-    working_directory: /home/circleci/go/src/github.com/geckoboard/sql-dataset
-    environment:
-      GOPATH: "/home/circleci/go"
+    executor: ubuntu
     steps:
-      - run: echo 'export PATH=$GOPATH/bin:$PATH' >> $BASH_ENV
+      - install_go
       - checkout
       - run: make build
       - store_artifacts:

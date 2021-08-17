@@ -6,7 +6,7 @@ MSPASS=zebra-IT-32
 
 DOCKER_MYSQL=mysql/mysql-server:5.7
 DOCKER_POSTGRES=postgres:9.6
-DOCKER_MSSQL=microsoft/mssql-server-linux
+DOCKER_MSSQL=mcr.microsoft.com/mssql/server:2017-latest
 DB_NAME=testdb
 
 build:
@@ -30,7 +30,7 @@ run-containers:
 	scripts/wait_for_mysql sd-mysql
 	# Postgres
 	docker run --name sd-postgres -e POSTGRES_PASSWORD=${PASSWORD} -p 5433:5432 -d ${DOCKER_POSTGRES} || true
-	scripts/wait_for_postgres 5433 ${PASSWORD}
+	scripts/wait_for_postgres sd-postgres
 
 setup-db:
 	# Mysql ensure root can access from anywhere
@@ -68,4 +68,4 @@ test:
 	MYSQL_URL="root:${PASSWORD}@tcp(localhost:3307)/testdb?parseTime=true" \
 	POSTGRES_URL=postgres://postgres:${PASSWORD}@localhost:5433/testdb?sslmode=disable \
 	MSSQL_URL="odbc:server=localhost;port=1433;user id=sa;password=${MSPASS};database=${DB_NAME}" \
-	./code_coverage.sh
+	go test ./... -race -covermode=atomic -coverprofile=coverage.txt
