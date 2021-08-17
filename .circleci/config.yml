@@ -1,11 +1,15 @@
 version: 2.1
 
-machine: &machine_setup
-  machine:
-    image: ubuntu-2004:202010-01
-  working_directory: /home/circleci/go/src/github.com/geckoboard/sql-dataset
-  environment:
-    GOPATH: "/home/circleci/go"
+orbs:
+  codecov: codecov/codecov@1.2.5
+
+executors:
+  ubuntu:
+    machine:
+      image: "ubuntu-2004:202010-01"
+    working_directory: /home/circleci/go/src/github.com/geckoboard/sql-dataset
+    environment:
+      GOPATH: "/home/circleci/go"
 
 commands:
   install_go:
@@ -24,19 +28,16 @@ commands:
 
 jobs:
   test:
-    <<: *machine_setup
+    executor: ubuntu
     steps:
       - install_go
       - checkout
       - run: make pull-docker-images run-containers
       - run: make setup-db
-      - run:
-          name: "Run tests and upload coverage report"
-          command: |
-            make test
-            bash <(curl -s https://codecov.io/bash)
+      - run: make test
+      - codecov/upload
   build:
-    <<: *machine_setup
+    executor: ubuntu
     steps:
       - install_go
       - checkout
