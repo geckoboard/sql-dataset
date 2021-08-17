@@ -68,4 +68,4 @@ test:
 	MYSQL_URL="root:${PASSWORD}@tcp(localhost:3307)/testdb?parseTime=true" \
 	POSTGRES_URL=postgres://postgres:${PASSWORD}@localhost:5433/testdb?sslmode=disable \
 	MSSQL_URL="odbc:server=localhost;port=1433;user id=sa;password=${MSPASS};database=${DB_NAME}" \
-	./code_coverage.sh
+	go test ./... -race -covermode=atomic -coverprofile=coverage.txt
