@@ -12,9 +12,9 @@ SQL-Dataset is available for macOS, Linux, and Windows.
 
 ### 1. Download the app
 
-* [macOS](https://github.com/geckoboard/sql-dataset/releases/download/v0.2.4/sql-dataset-darwin-10.10-amd64)
-* Linux [x86](https://github.com/geckoboard/sql-dataset/releases/download/v0.2.4/sql-dataset-linux-386) / [x64](https://github.com/geckoboard/sql-dataset/releases/download/v0.2.4/sql-dataset-linux-amd64)
-* Windows [x86](https://github.com/geckoboard/sql-dataset/releases/download/v0.2.4/sql-dataset-windows-8.0-386.exe) / [x64](https://github.com/geckoboard/sql-dataset/releases/download/v0.2.4/sql-dataset-windows-8.0-amd64.exe)
+* macOS [x64](https://github.com/geckoboard/sql-dataset/releases/download/v0.2.5/sql-dataset-darwin-amd64) / [arm64](https://github.com/geckoboard/sql-dataset/releases/download/v0.2.5/sql-dataset-darwin-arm64)
+* Linux [x86](https://github.com/geckoboard/sql-dataset/releases/download/v0.2.5/sql-dataset-linux-386) / [x64](https://github.com/geckoboard/sql-dataset/releases/download/v0.2.5/sql-dataset-linux-amd64)
+* Windows [x86](https://github.com/geckoboard/sql-dataset/releases/download/v0.2.5/sql-dataset-windows-386.exe) / [x64](https://github.com/geckoboard/sql-dataset/releases/download/v0.2.5/sql-dataset-windows-amd64.exe)
 
 #### Make it executable (macOS / Linux)
 
