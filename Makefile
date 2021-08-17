@@ -30,7 +30,7 @@ run-containers:
 	scripts/wait_for_mysql sd-mysql
 	# Postgres
 	docker run --name sd-postgres -e POSTGRES_PASSWORD=${PASSWORD} -p 5433:5432 -d ${DOCKER_POSTGRES} || true
-	scripts/wait_for_postgres 5433 ${PASSWORD}
+	scripts/wait_for_postgres sd-postgres
 
 setup-db:
 	# Mysql ensure root can access from anywhere

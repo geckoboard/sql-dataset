@@ -2,18 +2,16 @@
 
 # Taken from https://starkandwayne.com/blog/how-to-know-when-your-postgres-service-is-ready/
 
-PG_URI="postgres://postgres:$2@localhost:$1/shield"
 ATTEMPTS=0
-
-# make sure pg is ready to accept connections
-until pg_isready -h localhost -p $1 -U postgres > /dev/null
+until docker exec -it $1 /usr/bin/pg_isready -h localhost -p 5432 -U postgres
 do
   COUNTER=$((COUNTER + 1))
-  echo "Waiting for postgres at: $PG_URI"
-  
-  if [[ "$COUNTER" == 10 ]]; then
-    echo "PostgresDB still not responding after 10 attempts... Stopping"
+  echo "Waiting for postgres in docker container"
+
+  if [[ "$COUNTER" == 20 ]]; then
+    echo "PSQL still not responding after 20 attempts... Stopping"
     exit 1
   fi
+
   sleep 1;
 done
