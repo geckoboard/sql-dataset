@@ -160,6 +160,7 @@ SQL-Dataset supports all of the field types supported by the [Datasets API](http
 
 - date
 - datetime
+- duration
 - number
 - percentage
 - string
@@ -172,6 +173,16 @@ fields
  - name: MRR
    type: money
    currency_code: USD
+```
+
+The `duration` field type requires a `time_unit` to be provided:
+With a value one of: milliseconds, seconds, minutes, hours
+
+```yaml
+fields
+ - name: Time until support ticket resolved
+   type: duration
+   time_unit: minutes
 ```
 
 Numeric field types can support null values. For a field to support this, pass the `optional` key:
