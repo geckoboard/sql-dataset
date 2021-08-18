@@ -89,7 +89,7 @@ Enter the type of database you're connecting to in the `driver` field. SQL-Datas
 - `postgres`
 - `sqlite`
 
-If you'd like to see support for another type of database, please raise a [support ticket](https://support.geckoboard.com/hc/en-us/requests/new?ticket_form_id=39437) or, if you're technically inclined, make the change and submit a pull request!
+If you'd like to see support for another type of database, please raise a [support ticket](https://www.geckoboard.com/about/contact/) or, if you're technically inclined, make the change and submit a pull request!
 
 Only three parameters are required:
 
